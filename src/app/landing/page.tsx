@@ -1,0 +1,87 @@
+import Link from "next/link";
+import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
+import Image from "next/image";
+import Logo from "../../../public/tailorcv_logo.svg"
+
+export default function LandingPage() {
+  return (
+    <main className="min-h-screen bg-white text-gray-900 flex flex-col items-center">
+      {/* Hero */}
+      <nav className=" w-full flex items-center justify-between pt-2 px-6 bg-white shadow " >
+        <Image src={Logo} className="w-24" alt="Tailor CV logo" />
+        <Link href="/login" className="text-blue-600 p-4 flex items-center justify-center font-semibold underline">
+          Login
+        </Link>
+      </nav>
+      <section className="max-w-4xl text-center pt-28 space-y-6">
+        <h1 className="text-5xl md:text-6xl font-extrabold">
+          Get More Interviews with Resumes Tailored to the Job.
+          <span className="text-blue-600"> Instantly.</span>
+        </h1>
+
+        <p className="text-8 text-gray-600 max-w-2xl mx-auto">
+          Paste any job description. TailorCV uses AI to generate a
+          perfectly-matched resume and cover letter that beat ATS filters—no
+          templates, no guesswork.
+        </p>
+
+        <Link
+          href="/login"
+          className="inline-flex items-center space-x-2 bg-blue-600 text-white px-8 py-4 rounded-lg text-xl font-semibold hover:bg-blue-700 transition"
+        >
+          <span>Build My Resume Free</span>
+          <ArrowRight className="w-5 h-5" />
+        </Link>
+      </section>
+
+      {/* Features */}
+      <section className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-5 max-w-6xl">
+        <FeatureCard
+          icon={<Sparkles className="w-8 h-8 text-blue-600" />}
+          title="One Master Profile"
+          desc="Fill it once; we tailor it to any job in seconds."
+        />
+        <FeatureCard
+          icon={<Zap className="w-8 h-8 text-blue-600" />}
+          title="AI Tailoring Engine"
+          desc="Keyword-rich, quantified bullets that match the JD."
+        />
+        <FeatureCard
+          icon={<Shield className="w-8 h-8 text-blue-600" />}
+          title="ATS Optimized"
+          desc="Clean templates + score feedback to beat filters."
+        />
+      </section>
+
+      {/* Footer CTA */}
+      <footer className="mt-24 sticky bottom-0 w-full bg-gray-900 py-5 text-center">
+        <p className="text-gray-500">
+          Ready to land more interviews?{" "}
+          <Link href="/login" className="text-blue-600 font-semibold underline">
+            Start free today
+          </Link>
+        </p>
+      </footer>
+    </main>
+  );
+}
+
+function FeatureCard({
+  icon,
+  title,
+  desc,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <div className="flex flex-col rounded-2xl shadow-2xl shadow-blue-50 py-10 items-center text-center space-y-3">
+      <div className="p-3 bg-blue-50 w-14 h-16 flex items-center justify-center text-white rounded-full" >
+        {icon}
+      </div>
+      <h3 className="text-xl font-extrabold">{title}</h3>
+      <p className="text-gray-600 w-[80%]">{desc}</p>
+    </div>
+  );
+}
