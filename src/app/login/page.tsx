@@ -9,9 +9,11 @@ import toast from "react-hot-toast";
 export default function LoginPage() {
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") toast.success("Logged in successfully!");
-      if (event === "USER_UPDATED") toast.success("Account updated!");
+    const { data } = supabase.auth.onAuthStateChange((event: { session: "SIGNED_IN" | "SIGNED_OUT" | "PASSWORD_RECOVERY" | "USER_UPDATED" }) => {
+      if (event.session === "SIGNED_IN") toast.success("Logged in successfully!");
+      if (event.session === "SIGNED_OUT") toast.success("Logged out successfully!");
+      if (event.session === "PASSWORD_RECOVERY") toast.success("Password recovery email sent!");
+      if (event.session === "USER_UPDATED") toast.success("Account updated!");
     });
     return () => data.subscription.unsubscribe();
   }, []);

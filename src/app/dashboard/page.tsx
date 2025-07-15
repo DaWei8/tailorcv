@@ -33,7 +33,7 @@ export default function DashboardHome() {
                     title="Tailor Resume"
                     desc="Paste any job description and get a perfect resume in seconds."
                     link="/dashboard/tailor"
-                 />
+                />
                 {/* <Link
                     href="/dashboard/tailor"
                     className="group flex flex-col items-center justify-center p-8 border-2 rounded-xl hover:border-green-500 hover:shadow-lg transition"

@@ -1,2 +1,2 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@supabase/ssr";
 export const supabase = createClientComponentClient();
