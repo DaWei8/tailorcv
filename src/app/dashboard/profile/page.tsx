@@ -41,9 +41,9 @@ interface SectionProps<T> {
 }
 function Section<T extends FieldValues>({ title, form, table, addDefault, children }: SectionProps<T>) {
   // Add explicit types to the useFieldArray hook
-  const { fields, append, remove } = useFieldArray<{ items: T[] }, "items">({
+  const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "items",
+    name: "items" as never,
   });
   // const { fields, append, remove } = useFieldArray({
   //   control: form.control,
