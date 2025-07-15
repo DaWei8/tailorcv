@@ -1,25 +1,19 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
-import Image from "next/image";
-import Logo from "../../../public/tailorcv_logo.svg"
+import NavLanding from "@/components/NavLanding";
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-white text-gray-900 flex flex-col items-center">
+    <main className="min-h-screen relative transition-all ease-in-out duration-500 bg-white text-gray-900 flex flex-col items-center">
       {/* Hero */}
-      <nav className=" w-full flex items-center justify-between pt-2 px-6 bg-white shadow " >
-        <Image src={Logo} className="w-24" alt="Tailor CV logo" />
-        <Link href="/login" className="text-blue-600 p-4 flex items-center justify-center font-semibold underline">
-          Login
-        </Link>
-      </nav>
-      <section className="max-w-4xl text-center pt-28 space-y-6">
-        <h1 className="text-5xl md:text-6xl font-extrabold">
+      <NavLanding />
+      <section className="max-w-4xl text-center px-4 pt-28 space-y-6">
+        <h1 className="text-4xl md:text-6xl font-extrabold">
           Get More Interviews with Resumes Tailored to the Job.
           <span className="text-blue-600"> Instantly.</span>
         </h1>
 
-        <p className="text-8 text-gray-600 max-w-2xl mx-auto">
+        <p className=" text-gray-600 max-w-2xl mx-auto">
           Paste any job description. TailorCV uses AI to generate a
           perfectly-matched resume and cover letter that beat ATS filters—no
           templates, no guesswork.
@@ -27,7 +21,7 @@ export default function LandingPage() {
 
         <Link
           href="/login"
-          className="inline-flex items-center space-x-2 bg-blue-600 text-white px-8 py-4 rounded-lg text-xl font-semibold hover:bg-blue-700 transition"
+          className="inline-flex sticky top-16 items-center space-x-2 hover:shadow-2xl hover:shadow-blue-500 bg-blue-600 text-white px-4 lg:px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition"
         >
           <span>Build My Resume Free</span>
           <ArrowRight className="w-5 h-5" />
@@ -55,9 +49,9 @@ export default function LandingPage() {
 
       {/* Footer CTA */}
       <footer className="mt-24 sticky bottom-0 w-full bg-gray-900 py-5 text-center">
-        <p className="text-gray-500">
+        <p className="text-gray-400">
           Ready to land more interviews?{" "}
-          <Link href="/login" className="text-blue-600 font-semibold underline">
+          <Link href="/login" className="text-blue-500 font-semibold underline">
             Start free today
           </Link>
         </p>
@@ -76,8 +70,8 @@ function FeatureCard({
   desc: string;
 }) {
   return (
-    <div className="flex flex-col rounded-2xl shadow-2xl shadow-blue-50 py-10 items-center text-center space-y-3">
-      <div className="p-3 bg-blue-50 w-14 h-16 flex items-center justify-center text-white rounded-full" >
+    <div className="flex flex-col rounded-2xl shadow-2xl shadow-blue-200 py-10 items-center text-center space-y-3">
+      <div className="p-3 bg-blue-50 w-14 h-14 flex items-center justify-center text-white rounded-full" >
         {icon}
       </div>
       <h3 className="text-xl font-extrabold">{title}</h3>

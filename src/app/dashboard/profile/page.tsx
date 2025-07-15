@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { FieldValues, useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -39,12 +39,18 @@ interface SectionProps<T> {
   addDefault: T;
   children: (index: number, field: T & { id: string }) => React.ReactNode;
 }
-
-function Section<T extends Record<string, unknown>>({ title, form, table, addDefault, children }: SectionProps<T>) {
+function Section<T extends FieldValues>({ title, form, table, addDefault, children }: SectionProps<T>) {
+  // Add explicit types to the useFieldArray hook
   const { fields, append, remove } = useFieldArray<{ items: T[] }, "items">({
     control: form.control,
-    name: "items" as const,
+    name: "items",
   });
+  // const { fields, append, remove } = useFieldArray({
+  //   control: form.control,
+  //   name: "items",
+  // });
+
+
   useEffect(() => {
     (async () => {
       const uid = await userId();
@@ -152,7 +158,7 @@ export default function ProfilePage() {
       if (data) {
         Object.entries(data).forEach(([key, value]) => {
           if (key in profileSchema.shape) {
-            setValue(key as keyof ProfileForm, value as any); // Type assertion to bypass unknown
+            setValue(key as keyof ProfileForm, value as ProfileForm[keyof ProfileForm]); // Type assertion to bypass unknown
           }
         });
       }
@@ -250,11 +256,11 @@ export default function ProfilePage() {
       </Section>
 
       {/* Languages */}
-      <Section
+      <Section <LangForm>
         title="Languages"
         form={langForm}
         table="languages"
-        addDefault={{ language: "", level: "Beginner" }}
+        addDefault={{ language: "English", level: "Beginner" }}
       >
         {(i) => (
           <>
@@ -270,7 +276,7 @@ export default function ProfilePage() {
       </Section>
 
       {/* Skills */}
-      <Section
+      <Section <SkillForm>
         title="Skills"
         form={skillForm}
         table="skills"

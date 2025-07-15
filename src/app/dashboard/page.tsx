@@ -68,7 +68,7 @@ function DashboardCard({
             <div className="p-3 bg-blue-50 w-14 max-h-14 group-hover:scale-110 transition-transform flex items-center justify-center text-white rounded-full" >
                 {icon}
             </div>
-            <h3 className="text-xl font-extrabold">{title}</h3>
+            <h3 className="text-2xl font-extrabold">{title}</h3>
             <p className="text-gray-600 w-[80%]">{desc}</p>
         </Link>
     )

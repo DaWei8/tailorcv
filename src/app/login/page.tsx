@@ -8,20 +8,19 @@ import toast from "react-hot-toast";
 
 export default function LoginPage() {
 
-useEffect(() => {
-  const { data } = supabase.auth.onAuthStateChange((event) => {
-    if (event === "SIGNED_IN") toast.success("Logged in successfully!");
-    if (event === "USER_UPDATED") toast.success("Account updated!");
-  });
-  return () => data.subscription.unsubscribe();
-}, []);
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") toast.success("Logged in successfully!");
+      if (event === "USER_UPDATED") toast.success("Account updated!");
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
 
   return (
     <div className="bg-gray-100 w-screen h-screen flex flex-col items-center px-4 justify-center" >
       <div className=" max-w-lg bg-white w-full shadow-lg p-4 pt-8 lg:p-8 rounded-2xl">
-        {/* <img src="/logo.png" alt="TailorCV Logo" className="w-24 h-24 mb-6" /> */}
         <h1 className="text-3xl md:text-4xl text-black mb-4 font-extrabold text-center">Login to TailorCV</h1>
-        <p className="text-center text-gray-600 mb-6">
+        <p className="text-center text-gray-600 mb-2">
           Sign in to tailor your resume and get more interviews.
         </p>
         <div className=" max-w-md w-full" >
@@ -46,16 +45,16 @@ useEffect(() => {
                   inputText: "#111827",
                 },
                 fonts: {
-                  bodyFontFamily: "Inter, sans-serif",
-                  buttonFontFamily: "Inter, sans-serif",
-                  inputFontFamily: "Inter, sans-serif",
-                  labelFontFamily: "Inter, sans-serif",
+                  bodyFontFamily: "Poppins, sans-serif",
+                  buttonFontFamily: "Poppins, sans-serif",
+                  inputFontFamily: "Poppins, sans-serif",
+                  labelFontFamily: "Poppins, sans-serif",
                 },
                 fontSizes: {
                   baseBodySize: "16px",
                   baseButtonSize: "16px",
                   baseInputSize: "16px",
-                  baseLabelSize: "14px",
+                  baseLabelSize: "16px",
                 },
                 space: {
                   anchorBottomMargin: "16px",
