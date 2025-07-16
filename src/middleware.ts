@@ -8,8 +8,8 @@ export async function middleware(req: NextRequest) {
   // Log the authentication state for debugging
   console.log("Session in middleware:", session?.user);
 
-  if (!session && req.nextUrl.pathname.startsWith("/login")) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  if (!session && req.nextUrl.pathname.startsWith("/dashboard")) {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   return NextResponse.next();

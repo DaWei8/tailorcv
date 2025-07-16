@@ -38,7 +38,7 @@ export default function DashboardHome() {
                     icon={<FileText className="w-12 h-12 text-blue-600 group-hover:scale-110 transition-transform" />}
                     title="Cover Letter"
                     desc=""
-                    link="/dashboard/cover"
+                    link="/dashboard/cover-letter"
                 />
             </div>
         </main>
