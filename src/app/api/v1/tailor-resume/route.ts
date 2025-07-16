@@ -6,13 +6,18 @@ const openai = new OpenAI({ apiKey: process.env.KIMI_API_KEY! });
 
 export async function POST(req: Request) {
   const supabase = createRouteHandlerClient({ cookies });
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
   const { jobDescription, tone = "confident" } = await req.json();
 
   // Fetch profile & experiences
-  const { data: profile } = await supabase.from("profiles").select("*").single();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .single();
   const { data: experiences } = await supabase.from("experiences").select("*");
 
   const prompt = `
@@ -31,12 +36,18 @@ Use ${tone} tone, quantify achievements, include only relevant items.
   });
 
   const resumeJson = JSON.parse(completion.choices[0].message.content!);
-  const atsScore = Math.round((resumeJson.skills?.length / jobDescription.required_skills.length) * 100);
+  const atsScore = Math.round(
+    (resumeJson.skills?.length / jobDescription.required_skills.length) * 100
+  );
 
   // Save
   const { data } = await supabase
     .from("tailored_resumes")
-    .insert({ profile_id: user.id, resume_jsonb: resumeJson, ats_score: atsScore })
+    .insert({
+      profile_id: user.id,
+      resume_jsonb: resumeJson,
+      ats_score: atsScore,
+    })
     .select()
     .single();
 

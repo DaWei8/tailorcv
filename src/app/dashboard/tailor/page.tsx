@@ -54,18 +54,18 @@ export default function TailorPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl text-gray-900 mx-auto space-y-6">
       <h1 className="text-2xl font-bold">Tailor a Resume</h1>
 
       {/* Progress dots */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center gap-2 ">
         {steps.map((s, i) => (
           <div key={i} className="flex items-center space-x-2">
             <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">
               {i + 1}
             </div>
             <span className="text-sm">{s}</span>
-            {i < steps.length - 1 && <div className="w-8 border-t border-gray-300" />}
+            {i < steps.length - 1 && <div className="w-16 border-t border-gray-400" />}
           </div>
         ))}
       </div>
