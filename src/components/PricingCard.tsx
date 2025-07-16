@@ -71,7 +71,7 @@ export default function PricingCard({ plan }: PricingCardProps) {
 
     return (
         <div
-            className={`relative flex flex-col max-w-sm w-full mx-auto bg-white border transition duration-700 rounded-2xl shadow-lg shadow-blue-100 hover:shadow-2xl hover:shadow-blue-500 p-6 space-y-5
+            className={`relative h-[480px] flex flex-col max-w-sm w-full mx-auto bg-white border transition duration-700 rounded-2xl shadow-lg shadow-blue-100 hover:shadow-2xl hover:shadow-blue-500 p-6 space-y-5
         ${tier.accent ? "border-blue-500 ring-2 ring-blue-200" : "border-gray-200"}`}
         >
             {tier.accent && (
