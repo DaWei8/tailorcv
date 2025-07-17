@@ -23,17 +23,17 @@ export default async function DashboardPage() {
             <div className="bg-white shadow">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center py-6">
-                        <div className=" flex items-center gap-4" >
+                        <div className=" flex items-center gap-2" >
                             <Image
                                 src={user.user_metadata.avatar_url}
                                 alt="user profile image"
-                                width={70}
-                                height={70}
+                                width={40}
+                                height={40}
                                 className="rounded-full"
                             />
                             <div className="flex flex-col">
-                                <h1 className="text-xl font-bold" >{user.user_metadata.full_name}</h1>
-                                <p className=" text-gray-700 " >{user.user_metadata.email}</p>
+                                <h1 className="text-lg font-semibold" >{user.user_metadata.full_name}</h1>
+                                <p className=" text-gray-700 text-sm " >{user.user_metadata.email}</p>
                             </div>
                         </div>
                         <LogoutButton />
