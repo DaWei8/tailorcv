@@ -1,132 +1,120 @@
-“use client”;
+"use client";
 
-import { useState, ChangeEvent, FormEvent, useRef } from “react”;
+import { useState, ChangeEvent, FormEvent, useRef } from "react";
 import {
-UploadCloud,
-Download,
-FileText,
-AlertCircle,
-CheckCircle2,
-XCircle,
-Target,
-TrendingUp,
-Clock,
-X,
-RefreshCw,
-ExternalLink
-} from “lucide-react”;
+  UploadCloud,
+  Download,
+  FileText,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+  Target,
+  TrendingUp,
+  Clock,
+  X,
+  RefreshCw,
+  ExternalLink
+} from "lucide-react";
 
-/* ––––– Types ––––– */
 interface ATSResult {
-score: number;
-strengths: string[];
-improvements: string[];
-summary: string;
-matchedKeywords: string[];
-missingKeywords: string[];
-recommendations: string[];
+  score: number;
+  strengths: string[];
+  improvements: string[];
+  summary: string;
+  matchedKeywords: string[];
+  missingKeywords: string[];
+  recommendations: string[];
 }
 
 interface ToastState {
-message: string;
-type: “success” | “error” | “warning”;
-id: number;
+  message: string;
+  type: "success" | "error" | "warning";
+  id: number;
 }
 
-/* ––––– Enhanced ATS Engine ––––– */
 function runATS(resumeText: string, jdText: string): ATSResult {
-const extractKeywords = (text: string): string[] => {
-// Enhanced keyword extraction with better filtering
-const commonWords = new Set([
-‘the’, ‘and’, ‘or’, ‘but’, ‘in’, ‘on’, ‘at’, ‘to’, ‘for’, ‘of’, ‘with’, ‘by’,
-‘from’, ‘as’, ‘is’, ‘are’, ‘was’, ‘were’, ‘be’, ‘been’, ‘have’, ‘has’, ‘had’,
-‘do’, ‘does’, ‘did’, ‘will’, ‘would’, ‘could’, ‘should’, ‘may’, ‘might’, ‘must’,
-‘can’, ‘this’, ‘that’, ‘these’, ‘those’, ‘a’, ‘an’, ‘we’, ‘you’, ‘they’, ‘it’,
-‘he’, ‘she’, ‘him’, ‘her’, ‘his’, ‘their’, ‘our’, ‘my’, ‘your’, ‘years’, ‘year’,
-‘experience’, ‘work’, ‘working’, ‘job’, ‘role’, ‘position’, ‘company’, ‘team’
-]);
+  const extractKeywords = (text: string): string[] => {
+    const commonWords = new Set([
+      'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+      'from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had',
+      'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must',
+      'can', 'this', 'that', 'these', 'those', 'a', 'an', 'we', 'you', 'they', 'it',
+      'he', 'she', 'him', 'her', 'his', 'their', 'our', 'my', 'your', 'years', 'year',
+      'experience', 'work', 'working', 'job', 'role', 'position', 'company', 'team'
+    ]);
 
-```
-return text.toLowerCase()
-  .match(/\b[a-z]+(?:[+#]|\b)/g) || []
-  .filter(word => word.length > 2 && !commonWords.has(word))
-  .filter(word => !/^\d+$/.test(word));
-```
+    return text.toLowerCase()
+      .match(/\b[a-z]+(?:[+#]|\b)/g) || []
+      .filter(word => word.length > 2 && !commonWords.has(word))
+      .filter(word => !/^\d+$/.test(word));
+  };
 
-};
+  const jdKeywords = new Set(extractKeywords(jdText));
+  const resumeKeywords = new Set(extractKeywords(resumeText));
 
-const jdKeywords = new Set(extractKeywords(jdText));
-const resumeKeywords = new Set(extractKeywords(resumeText));
+  const matchedKeywords = [...jdKeywords].filter(k => resumeKeywords.has(k));
+  const missingKeywords = [...jdKeywords].filter(k => !resumeKeywords.has(k));
 
-const matchedKeywords = […jdKeywords].filter(k => resumeKeywords.has(k));
-const missingKeywords = […jdKeywords].filter(k => !resumeKeywords.has(k));
+  const score = jdKeywords.size > 0 ? Math.round((matchedKeywords.length / jdKeywords.size) * 100) : 0;
 
-const score = jdKeywords.size > 0 ? Math.round((matchedKeywords.length / jdKeywords.size) * 100) : 0;
+  const getRecommendations = (score: number): string[] => {
+    const recommendations = [];
 
-const getRecommendations = (score: number): string[] => {
-const recommendations = [];
+    if (score < 30) {
+      recommendations.push("Consider restructuring your resume to better align with the job requirements");
+      recommendations.push("Focus on highlighting relevant technical skills and experience");
+      recommendations.push("Use industry-specific terminology from the job description");
+    } else if (score < 60) {
+      recommendations.push("Add more specific keywords from the job description");
+      recommendations.push("Quantify your achievements with numbers and metrics");
+      recommendations.push("Emphasize relevant projects and accomplishments");
+    } else if (score < 80) {
+      recommendations.push("Fine-tune your resume with missing keywords");
+      recommendations.push("Ensure your experience section directly addresses job requirements");
+    } else {
+      recommendations.push("Your resume is well-aligned! Consider minor optimizations");
+      recommendations.push("Focus on quantifying achievements and impact");
+    }
 
-```
-if (score < 30) {
-  recommendations.push("Consider restructuring your resume to better align with the job requirements");
-  recommendations.push("Focus on highlighting relevant technical skills and experience");
-  recommendations.push("Use industry-specific terminology from the job description");
-} else if (score < 60) {
-  recommendations.push("Add more specific keywords from the job description");
-  recommendations.push("Quantify your achievements with numbers and metrics");
-  recommendations.push("Emphasize relevant projects and accomplishments");
-} else if (score < 80) {
-  recommendations.push("Fine-tune your resume with missing keywords");
-  recommendations.push("Ensure your experience section directly addresses job requirements");
-} else {
-  recommendations.push("Your resume is well-aligned! Consider minor optimizations");
-  recommendations.push("Focus on quantifying achievements and impact");
+    return recommendations;
+  };
+
+  const getSummary = (score: number): string => {
+    if (score >= 80) return "Excellent match! Your resume strongly aligns with the job requirements.";
+    if (score >= 60) return "Good match with room for improvement. Focus on incorporating missing keywords.";
+    if (score >= 40) return "Fair match. Consider significant updates to better align with the job description.";
+    return "Low match. Your resume needs substantial revision to meet the job requirements.";
+  };
+
+  return {
+    score,
+    matchedKeywords,
+    missingKeywords: missingKeywords.slice(0, 10),
+    strengths: matchedKeywords.length > 0
+      ? matchedKeywords.slice(0, 8).map(k => `Strong alignment: ${k}`)
+      : ["No key skills detected from job description"],
+    improvements: missingKeywords.length > 0
+      ? missingKeywords.slice(0, 8).map(k => `Consider adding: ${k}`)
+      : ["Great keyword coverage!"],
+    recommendations: getRecommendations(score),
+    summary: getSummary(score)
+  };
 }
 
-return recommendations;
-```
-
-};
-
-const getSummary = (score: number): string => {
-if (score >= 80) return “Excellent match! Your resume strongly aligns with the job requirements.”;
-if (score >= 60) return “Good match with room for improvement. Focus on incorporating missing keywords.”;
-if (score >= 40) return “Fair match. Consider significant updates to better align with the job description.”;
-return “Low match. Your resume needs substantial revision to meet the job requirements.”;
-};
-
-return {
-score,
-matchedKeywords,
-missingKeywords: missingKeywords.slice(0, 10),
-strengths: matchedKeywords.length > 0
-? matchedKeywords.slice(0, 8).map(k => `Strong alignment: ${k}`)
-: [“No key skills detected from job description”],
-improvements: missingKeywords.length > 0
-? missingKeywords.slice(0, 8).map(k => `Consider adding: ${k}`)
-: [“Great keyword coverage!”],
-recommendations: getRecommendations(score),
-summary: getSummary(score)
-};
-}
-
-/* ––––– File Processing ––––– */
 async function extractTextFromFile(file: File): Promise<string> {
-return new Promise((resolve, reject) => {
-const reader = new FileReader();
-reader.onload = (e) => {
-const text = e.target?.result as string;
-// Simple text extraction - in production, you’d use proper PDF/Word parsers
-resolve(text || “”);
-};
-reader.onerror = () => reject(new Error(“Failed to read file”));
-reader.readAsText(file);
-});
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      resolve(text || "");
+    };
+    reader.onerror = () => reject(new Error("Failed to read file"));
+    reader.readAsText(file);
+  });
 }
 
-/* ––––– Report Generation ––––– */
 function downloadReport(result: ATSResult, fileName: string) {
-const reportContent = `
+  const reportContent = `
 ATS RESUME SCAN REPORT
 Generated: ${new Date().toLocaleString()}
 
@@ -140,19 +128,19 @@ ${result.summary}
 ═══════════════════════════════════════════════════════════════
 
 STRENGTHS IDENTIFIED:
-${result.strengths.map((s, i) => `${i + 1}. ${s}`).join(’\n’)}
+${result.strengths.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
 AREAS FOR IMPROVEMENT:
-${result.improvements.map((i, idx) => `${idx + 1}. ${i}`).join(’\n’)}
+${result.improvements.map((i, idx) => `${idx + 1}. ${i}`).join('\n')}
 
 RECOMMENDATIONS:
-${result.recommendations.map((r, i) => `${i + 1}. ${r}`).join(’\n’)}
+${result.recommendations.map((r, i) => `${i + 1}. ${r}`).join('\n')}
 
 ═══════════════════════════════════════════════════════════════
 
 KEYWORD ANALYSIS:
-Matched Keywords (${result.matchedKeywords.length}): ${result.matchedKeywords.join(’, ‘)}
-Missing Keywords (${result.missingKeywords.length}): ${result.missingKeywords.join(’, ’)}
+Matched Keywords (${result.matchedKeywords.length}): ${result.matchedKeywords.join(', ')}
+Missing Keywords (${result.missingKeywords.length}): ${result.missingKeywords.join(', ')}
 
 ═══════════════════════════════════════════════════════════════
 
@@ -167,127 +155,120 @@ Disclaimer: This analysis is for guidance only. Always ensure your resume
 truthfully represents your experience and qualifications.
 `.trim();
 
-const blob = new Blob([reportContent], { type: “text/plain;charset=utf-8” });
-const url = URL.createObjectURL(blob);
-const a = document.createElement(“a”);
-a.href = url;
-a.download = `${fileName}_ATS_Report.txt`;
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-URL.revokeObjectURL(url);
+  const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${fileName}_ATS_Report.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
-/* ––––– Main Component ––––– */
 export default function ATSScanner() {
-const [file, setFile] = useState<File | null>(null);
-const [jobDescription, setJobDescription] = useState(””);
-const [loading, setLoading] = useState(false);
-const [result, setResult] = useState<ATSResult | null>(null);
-const [showModal, setShowModal] = useState(false);
-const [toasts, setToasts] = useState<ToastState[]>([]);
-const fileInputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [jobDescription, setJobDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ATSResult | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [toasts, setToasts] = useState<ToastState[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-const addToast = (message: string, type: “success” | “error” | “warning”) => {
-const id = Date.now();
-setToasts(prev => […prev, { message, type, id }]);
-setTimeout(() => {
-setToasts(prev => prev.filter(t => t.id !== id));
-}, 5000);
-};
+  const addToast = (message: string, type: "success" | "error" | "warning") => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { message, type, id }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 5000);
+  };
 
-const removeToast = (id: number) => {
-setToasts(prev => prev.filter(t => t.id !== id));
-};
+  const removeToast = (id: number) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  };
 
-const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-const uploadedFile = e.target.files?.[0];
-if (!uploadedFile) return;
+  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const uploadedFile = e.target.files?.[0];
+    if (!uploadedFile) return;
 
-```
-const validTypes = [
-  "application/pdf",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "text/plain"
-];
+    const validTypes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "text/plain"
+    ];
 
-if (!validTypes.includes(uploadedFile.type)) {
-  addToast("Please upload a PDF, Word document, or text file", "error");
-  return;
-}
+    if (!validTypes.includes(uploadedFile.type)) {
+      addToast("Please upload a PDF, Word document, or text file", "error");
+      return;
+    }
 
-if (uploadedFile.size > 10 * 1024 * 1024) { // 10MB limit
-  addToast("File size must be less than 10MB", "error");
-  return;
-}
+    if (uploadedFile.size > 10 * 1024 * 1024) {
+      addToast("File size must be less than 10MB", "error");
+      return;
+    }
 
-setFile(uploadedFile);
-addToast("Resume uploaded successfully!", "success");
-```
+    setFile(uploadedFile);
+    addToast("Resume uploaded successfully!", "success");
+  };
 
-};
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
 
-const handleSubmit = async (e: FormEvent) => {
-e.preventDefault();
+    if (!file) {
+      addToast("Please upload your resume", "error");
+      return;
+    }
 
-```
-if (!file) {
-  addToast("Please upload your resume", "error");
-  return;
-}
+    if (!jobDescription.trim()) {
+      addToast("Please enter the job description", "error");
+      return;
+    }
 
-if (!jobDescription.trim()) {
-  addToast("Please enter the job description", "error");
-  return;
-}
+    if (jobDescription.trim().length < 100) {
+      addToast("Job description seems too short. Please provide a detailed job description", "warning");
+      return;
+    }
 
-if (jobDescription.trim().length < 100) {
-  addToast("Job description seems too short. Please provide a detailed job description", "warning");
-  return;
-}
+    setLoading(true);
 
-setLoading(true);
+    try {
+      const resumeText = await extractTextFromFile(file);
+      const analysisResult = runATS(resumeText, jobDescription);
+      setResult(analysisResult);
+      setShowModal(true);
+      addToast("Analysis complete!", "success");
+    } catch (error) {
+      addToast("Error processing your resume. Please try again.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-try {
-  const resumeText = await extractTextFromFile(file);
-  const analysisResult = runATS(resumeText, jobDescription);
-  setResult(analysisResult);
-  setShowModal(true);
-  addToast("Analysis complete!", "success");
-} catch (error) {
-  addToast("Error processing your resume. Please try again.", "error");
-} finally {
-  setLoading(false);
-}
-```
+  const resetForm = () => {
+    setFile(null);
+    setJobDescription("");
+    setResult(null);
+    setShowModal(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
-};
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-yellow-600";
+    if (score >= 40) return "text-orange-600";
+    return "text-red-600";
+  };
 
-const resetForm = () => {
-setFile(null);
-setJobDescription(””);
-setResult(null);
-setShowModal(false);
-if (fileInputRef.current) {
-fileInputRef.current.value = “”;
-}
-};
+  const getScoreBackground = (score: number) => {
+    if (score >= 80) return "bg-green-50 border-green-200";
+    if (score >= 60) return "bg-yellow-50 border-yellow-200";
+    if (score >= 40) return "bg-orange-50 border-orange-200";
+    return "bg-red-50 border-red-200";
+  };
 
-const getScoreColor = (score: number) => {
-if (score >= 80) return “text-green-600”;
-if (score >= 60) return “text-yellow-600”;
-if (score >= 40) return “text-orange-600”;
-return “text-red-600”;
-};
-
-const getScoreBackground = (score: number) => {
-if (score >= 80) return “bg-green-50 border-green-200”;
-if (score >= 60) return “bg-yellow-50 border-yellow-200”;
-if (score >= 40) return “bg-orange-50 border-orange-200”;
-return “bg-red-50 border-red-200”;
-};
-
-return (
+  return (
 <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
 {/* Toast Container */}
 <div className="fixed top-4 right-4 z-50 space-y-2">
@@ -306,8 +287,6 @@ className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-white te
 </div>
 ))}
 </div>
-
-```
   <div className="max-w-4xl mx-auto py-8 px-4">
     {/* Header */}
     <div className="text-center mb-8">
@@ -536,6 +515,5 @@ className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-white te
     )}
   </div>
 </div>
-```
 );
 }
