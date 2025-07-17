@@ -17,7 +17,7 @@ export default function LogoutButton() {
         <button
             onClick={handleLogout}
             role="button"
-            className="btn-danger flex gap-2 py-2 px-3 items-center justify-center "
+            className=" bg-gray-800 text-sm text-white flex gap-2 py-2 px-3 items-center justify-center "
         >
             <LogOut /> Logout
         </button>

@@ -95,7 +95,7 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, childr
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           aria-label={`Add new ${title}`}
         >
-          <PlusCircle size={16} className="mr-2" />
+          <PlusCircle size={16} />
         </button>
       </div>
 
@@ -124,7 +124,7 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, childr
         <button
           type="button"
           onClick={save}
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           Save {title}
         </button>
@@ -219,16 +219,16 @@ export default function ProfilePage() {
   );
 
   const TextArea = ({ className = "", ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
-    <textarea 
-      {...props} 
-      className={`block w-full rounded-md px-2 placeholder-gray-300 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`} 
+    <textarea
+      {...props}
+      className={`block w-full rounded-md px-2 placeholder-gray-300 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`}
     />
   );
 
   const Select = ({ className = "", ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) => (
     <select
       {...props}
-      className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`}
+      className={`block w-full px-2 text-gray-700 placeholder-gray-300 min-h-[42px] rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm${className}`}
     />
   );
 
@@ -483,15 +483,17 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 ">
       {/* Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div className="text-3xl flex items-center justify-center gap-2 font-bold text-gray-900">
+            <div className="text-xl flex items-center justify-center gap-2 font-bold text-gray-900">
               <Link href="/dashboard">
                 <ArrowLeft />
-              </Link> Master Profile</div>
+              </Link>
+              Master Profile
+            </div>
             <div className="text-sm text-gray-500">
               Step {currentStep + 1} of {steps.length}
             </div>
@@ -502,7 +504,7 @@ export default function ProfilePage() {
       {/* Step Navigation */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex lg:space-x-6 space-x-2 w-full overflow-scroll " aria-label="Tabs">
+          <nav className="flex items-center justify-center lg:space-x-6 space-x-4 w-full overflow-x-scroll " aria-label="Tabs">
             {steps.map((step, index) => {
               const Icon = step.icon;
               return (

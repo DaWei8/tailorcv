@@ -98,7 +98,7 @@ export default function PricingCard({ plan }: PricingCardProps) {
                 <ul className="space-y-3 text-sm">
                     {tier.features.map((f) => (
                         <li key={f} className="flex text-left items-center gap-1">
-                            <Check size={16} className="text-green-400 font-bold bg-gray-50 p-1 w-5 h-5 rounded-full" />
+                            <Check size={16} className="text-green-400 font-bold bg-gradient-to-br from-blue-50 to-indigo-100p-1 w-5 h-5 rounded-full" />
                             {f}
                         </li>
                     ))}

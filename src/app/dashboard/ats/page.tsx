@@ -13,8 +13,10 @@ import {
   Clock,
   X,
   RefreshCw,
-  ExternalLink
+  ExternalLink,
+  ArrowLeft
 } from "lucide-react";
+import Link from "next/link";
 
 interface ATSResult {
   score: number;
@@ -43,8 +45,8 @@ function runATS(resumeText: string, jdText: string): ATSResult {
       'experience', 'work', 'working', 'job', 'role', 'position', 'company', 'team'
     ]);
 
-    return text.toLowerCase()
-      .match(/\b[a-z]+(?:[+#]|\b)/g) || []
+    return (text.toLowerCase()
+      .match(/\b[a-z]+(?:[+#]|\b)/g) || [])
       .filter(word => word.length > 2 && !commonWords.has(word))
       .filter(word => !/^\d+$/.test(word));
   };
@@ -238,6 +240,7 @@ export default function ATSScanner() {
       setShowModal(true);
       addToast("Analysis complete!", "success");
     } catch (error) {
+      console.error(error);
       addToast("Error processing your resume. Please try again.", "error");
     } finally {
       setLoading(false);
@@ -269,251 +272,259 @@ export default function ATSScanner() {
   };
 
   return (
-<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-{/* Toast Container */}
-<div className="fixed top-4 right-4 z-50 space-y-2">
-{toasts.map(toast => (
-<div
-key={toast.id}
-className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300 ${ toast.type === "success" ? "bg-green-500" :  toast.type === "error" ? "bg-red-500" : "bg-orange-500" }`}
->
-{toast.type === “success” && <CheckCircle2 size={16} />}
-{toast.type === “error” && <XCircle size={16} />}
-{toast.type === “warning” && <AlertCircle size={16} />}
-{toast.message}
-<button onClick={() => removeToast(toast.id)} className=“ml-2”>
-<X size={14} />
-</button>
-</div>
-))}
-</div>
-  <div className="max-w-4xl mx-auto py-8 px-4">
-    {/* Header */}
-    <div className="text-center mb-8">
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">
-        ATS Resume Scanner
-      </h1>
-      <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-        Upload your resume and job description to get an instant ATS compatibility score 
-        with actionable insights to improve your chances.
-      </p>
-    </div>
-
-    {/* Main Form */}
-    <div className="bg-white rounded-xl shadow-xl p-8 mb-8">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* File Upload */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Upload Your Resume
-          </label>
-          <div className="relative">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.docx,.txt"
-              onChange={handleFileUpload}
-              className="hidden"
-              id="resume-upload"
-            />
-            <label
-              htmlFor="resume-upload"
-              className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
-            >
-              <div className="flex flex-col items-center space-y-2">
-                <UploadCloud className="w-8 h-8 text-gray-400" />
-                <p className="text-sm text-gray-600">
-                  {file ? file.name : "Click to upload your resume"}
-                </p>
-                <p className="text-xs text-gray-500">
-                  PDF, Word, or Text files (max 10MB)
-                </p>
-              </div>
-            </label>
-          </div>
-          {file && (
-            <div className="mt-2 flex items-center gap-2 text-sm text-green-600">
-              <FileText size={16} />
-              <span>{file.name} ({(file.size / 1024).toFixed(1)} KB)</span>
+    <div className="min-h-screen h-full w-full flex flex-col items-center bg-gray-50  pb-20">
+      {/* Toast Container */}
+      <div className="fixed top-4 right-4 z-50 space-y-2">
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300 ${toast.type === "success" ? "bg-green-500" : toast.type === "error" ? "bg-red-500" : "bg-orange-500"}`}
+          >
+            {toast.type === "success" && <CheckCircle2 size={16} />}
+            {toast.type === "error" && <XCircle size={16} />}
+            {toast.type === "warning" && <AlertCircle size={16} />}
+            {toast.message}
+            <div onClick={() => removeToast(toast.id)} className="ml-2">
+              <X size={14} />
             </div>
-          )}
-        </div>
+          </div>
+        ))}
+      </div>
+      {/* Header */}
+      <div className="bg-white mb-4 w-full px-4 lg:px-8 shadow">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+          <div className="flex items-center py-6">
+            <div className="text-xl flex items-center justify-center gap-2 font-bold text-gray-900">
+              <Link href="/dashboard">
+                <ArrowLeft />
+              </Link>
+              ATS Resume Scanner
+            </div>
+          </div>
 
-        {/* Job Description */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Job Description
-          </label>
-          <textarea
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-            rows={8}
-            placeholder="Paste the complete job description here. Include requirements, responsibilities, and preferred qualifications for the most accurate analysis..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            <strong>Tip:</strong> For best results, use the complete job posting including requirements and qualifications.
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-4">
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <RefreshCw className="w-5 h-5 animate-spin" />
-                Analyzing...
-              </>
-            ) : (
-              <>
-                <Target className="w-5 h-5" />
-                Run ATS Analysis
-              </>
-            )}
-          </button>
-          
-          <button
-            type="button"
-            onClick={resetForm}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Reset
-          </button>
-        </div>
-      </form>
-    </div>
-
-    {/* Disclaimer */}
-    <div className="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-r-lg mb-8">
-      <div className="flex items-start gap-3">
-        <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-        <div>
-          <h3 className="font-semibold text-amber-800 mb-2">Important Notice</h3>
-          <p className="text-amber-700 text-sm leading-relaxed">
-            <strong>Integrity First:</strong> Falsifying work experience or skills is fraudulent and can lead to serious consequences. 
-            This tool is designed to help you optimize your <em>genuine</em> qualifications. Take time to actually develop the skills you lack.
-          </p>
-          <p className="text-amber-700 text-sm mt-2">
-            <strong>Need help planning your learning journey?</strong> Try{" "}
-            <a 
-              href="https://phasely.app" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-amber-800 font-medium hover:text-amber-900 underline inline-flex items-center gap-1"
-            >
-              Phasely <ExternalLink size={12} />
-            </a>
-            {" "}to create structured learning plans and track your progress.
-          </p>
         </div>
       </div>
-    </div>
+      <div className="w-full mx-auto flex flex-col gap-8 px-8 ">
+        {/* Disclaimer */}
+        <div className="bg-amber-50 border-l-4 max-w-7xl mx-auto border-amber-400 lg:p-4 p-3 rounded-r-lg ">
+          <div className="flex items-start gap-3">
 
-    {/* Results Modal */}
-    {showModal && result && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <TrendingUp className="w-6 h-6" />
-                ATS Analysis Results
-              </h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X size={24} />
-              </button>
+            <div>
+              <h3 className="font-semibold flex text-amber-800 mb-2">      <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0 mr-2" />Important Notice</h3>
+              <p className="text-amber-700 text-sm leading-relaxed">
+                <strong>Integrity First:</strong> Falsifying work experience or skills is fraudulent and can lead to serious consequences.
+                This tool is designed to help you optimize your <em>genuine</em> qualifications. Take time to actually develop the skills you lack.
+              </p>
+              <p className="text-amber-700 text-sm mt-2">
+                <strong>Need help planning your learning journey?</strong> Try{" "}
+                <a
+                  href="https://phasely.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-800 font-bold hover:text-amber-900 underline inline-flex items-center gap-1"
+                >
+                  Phasely <ExternalLink size={12} />
+                </a>
+                {" "}to create structured learning plans and track your progress.
+              </p>
             </div>
           </div>
+        </div>
 
-          <div className="p-6 space-y-6">
-            {/* Score Display */}
-            <div className={`text-center p-6 rounded-lg border-2 ${getScoreBackground(result.score)}`}>
-              <div className={`text-6xl font-bold ${getScoreColor(result.score)} mb-2`}>
-                {result.score}
-                <span className="text-2xl text-gray-500">/100</span>
+        {/* Main Form */}
+        <div className="bg-white mx-auto max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
+          <p className="text-sm text-center bg-gray-100 p-3 rounded-lg mb-4 w-full text-gray-600">
+            Upload your resume and job description to get an instant ATS compatibility score
+            with actionable insights to improve your chances.
+          </p>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* File Upload */}
+            <div>
+              <label className="block text-base font-semibold text-gray-700 mb-2">
+                Upload Your Resume
+              </label>
+              <div className="relative">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.docx,.txt"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="resume-upload"
+                />
+                <label
+                  htmlFor="resume-upload"
+                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
+                >
+                  <div className="flex flex-col items-center space-y-2">
+                    <UploadCloud className="w-8 h-8 text-gray-400" />
+                    <p className="text-sm text-gray-600">
+                      {file ? file.name : "Click to upload your resume"}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      PDF, Word, or Text files (max 10MB)
+                    </p>
+                  </div>
+                </label>
               </div>
-              <p className="text-gray-700 font-medium">{result.summary}</p>
+              {file && (
+                <div className="mt-2 flex items-center gap-2 text-sm text-green-600">
+                  <FileText size={16} />
+                  <span>{file.name} ({(file.size / 1024).toFixed(1)} KB)</span>
+                </div>
+              )}
             </div>
 
-            {/* Analysis Grid */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Strengths */}
-              <div className="bg-green-50 rounded-lg p-4">
-                <h3 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5" />
-                  Strengths ({result.matchedKeywords.length})
-                </h3>
-                <ul className="space-y-2">
-                  {result.strengths.map((strength, index) => (
-                    <li key={index} className="text-sm text-green-700 flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
-                      {strength}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Improvements */}
-              <div className="bg-red-50 rounded-lg p-4">
-                <h3 className="font-semibold text-red-800 mb-3 flex items-center gap-2">
-                  <XCircle className="w-5 h-5" />
-                  Areas for Improvement ({result.missingKeywords.length})
-                </h3>
-                <ul className="space-y-2">
-                  {result.improvements.map((improvement, index) => (
-                    <li key={index} className="text-sm text-red-700 flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
-                      {improvement}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* Recommendations */}
-            <div className="bg-blue-50 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Recommendations
-              </h3>
-              <ul className="space-y-2">
-                {result.recommendations.map((rec, index) => (
-                  <li key={index} className="text-sm text-blue-700 flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
-                    {rec}
-                  </li>
-                ))}
-              </ul>
+            {/* Job Description */}
+            <div>
+              <label className="block text-base font-semibold text-gray-700 mb-2">
+                Job Description
+              </label>
+              <textarea
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                rows={8}
+                placeholder="Paste the complete job description here. Include requirements, responsibilities, and preferred qualifications for the most accurate analysis..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                <strong>Tip:</strong> For best results, use the complete job posting including requirements and qualifications.
+              </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4">
               <button
-                onClick={() => downloadReport(result, file?.name.split('.')[0] || 'Resume')}
-                className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                type="submit"
+                disabled={loading}
+                className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
-                <Download className="w-5 h-5" />
-                Download Detailed Report
+                {loading ? (
+                  <>
+                    <RefreshCw className="w-5 h-5 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    Run ATS Analysis
+                    <Target className="w-5 h-5" />
+                  </>
+                )}
               </button>
+
               <button
-                onClick={() => setShowModal(false)}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                type="button"
+                onClick={resetForm}
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gradient-to-br from-blue-50 to-indigo-100transition-colors"
               >
-                Close
+                Reset
               </button>
             </div>
-          </div>
+          </form>
         </div>
+
+        {/* Results Modal */}
+        {showModal && result && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <TrendingUp className="w-6 h-6" />
+                    ATS Analysis Results
+                  </h2>
+                  <div
+                    onClick={() => setShowModal(false)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <X size={24} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-6">
+                {/* Score Display */}
+                <div className={`text-center p-6 rounded-lg border-2 ${getScoreBackground(result.score)}`}>
+                  <div className={`text-6xl font-bold ${getScoreColor(result.score)} mb-2`}>
+                    {result.score}
+                    <span className="text-2xl text-gray-500">/100</span>
+                  </div>
+                  <p className="text-gray-700 font-medium">{result.summary}</p>
+                </div>
+
+                {/* Analysis Grid */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Strengths */}
+                  <div className="bg-green-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5" />
+                      Strengths ({result.matchedKeywords.length})
+                    </h3>
+                    <ul className="space-y-2">
+                      {result.strengths.map((strength, index) => (
+                        <li key={index} className="text-sm text-green-700 flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
+                          {strength}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Improvements */}
+                  <div className="bg-red-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-red-800 mb-3 flex items-center gap-2">
+                      <XCircle className="w-5 h-5" />
+                      Areas for Improvement ({result.missingKeywords.length})
+                    </h3>
+                    <ul className="space-y-2">
+                      {result.improvements.map((improvement, index) => (
+                        <li key={index} className="text-sm text-red-700 flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                          {improvement}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Recommendations */}
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                    <Clock className="w-5 h-5" />
+                    Recommendations
+                  </h3>
+                  <ul className="space-y-2">
+                    {result.recommendations.map((rec, index) => (
+                      <li key={index} className="text-sm text-blue-700 flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
+                        {rec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-4 pt-4">
+                  <button
+                    onClick={() => downloadReport(result, file?.name.split('.')[0] || 'Resume')}
+                    className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-5 h-5" />
+                    Download Detailed Report
+                  </button>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gradient-to-br from-blue-50 to-indigo-100transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    )}
-  </div>
-</div>
-);
+    </div >
+  );
+
 }
