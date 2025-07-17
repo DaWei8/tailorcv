@@ -1,12 +1,47 @@
-"use client";
-
 import Link from "next/link";
 import { UserCircle, FileText } from "lucide-react";
+import { createClient } from "@/lib/supabase-server"
+import { redirect } from "next/navigation"
+import Image from "next/image";
+import LogoutButton from "@/components/LogoutButton";
 
-export default function DashboardHome() {
+export default async function DashboardPage() {
+    const supabase = await createClient()
+
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+    // console.log(user)
+
+    if (!user) {
+        redirect('/login')
+    }
+
     return (
-        <main className="max-w-4xl mx-auto py-16 px-6 text-black space-y-12">
-            <h1 className="text-5xl font-bold text-center">Welcome to TailorCV</h1>
+        <main className="min-h-screen bg-gray-50 mx-auto flex flex-col text-black space-y-12">
+            {/* Header */}
+            <div className="bg-white shadow">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center py-6">
+                        <div className=" flex items-center gap-4" >
+                            <Image
+                                src={user.user_metadata.avatar_url}
+                                alt="user profile image"
+                                width={70}
+                                height={70}
+                                className="rounded-full"
+                            />
+                            <div className="flex flex-col">
+                                <h1 className="text-xl font-bold" >{user.user_metadata.full_name}</h1>
+                                <p className=" text-gray-700 " >{user.user_metadata.email}</p>
+                            </div>
+                        </div>
+                        <LogoutButton />
+
+                    </div>
+                </div>
+            </div>
+
 
             <div className="grid md:grid-cols-2 gap-6">
                 {/* Profile card */}
@@ -29,7 +64,7 @@ export default function DashboardHome() {
                 <DashboardCard
                     icon={<FileText className="w-12 h-12 text-red-600 group-hover:scale-110 transition-transform" />}
                     title="ATS Score"
-                    desc=""
+                    desc="Track your progress, and increase your chances of getting hired."
                     link="/dashboard/ats"
                 />
 
@@ -37,7 +72,7 @@ export default function DashboardHome() {
                 <DashboardCard
                     icon={<FileText className="w-12 h-12 text-blue-600 group-hover:scale-110 transition-transform" />}
                     title="Cover Letter"
-                    desc=""
+                    desc="Craft a professional cover letter that stands out."
                     link="/dashboard/cover-letter"
                 />
             </div>
@@ -59,7 +94,7 @@ function DashboardCard({
     return (
         <Link
             href={link}
-            className="group flex flex-col rounded-2xl shadow-2xl shadow-gray-200 py-10 items-center text-center space-y-3 hover:shadow-2xl hover:shadow-blue-200 transition"
+            className="group flex flex-col rounded-2xl shadow-2xl shadow-gray-200 py-10 items-center text-center space-y-3 hover:shadow-2xl hover:bg-blue-50 hover:shadow-blue-200 hover:scale-105 transition"
         >
             <div className="p-3 bg-blue-50 w-14 max-h-14 group-hover:scale-110 transition-transform flex items-center justify-center text-white rounded-full" >
                 {icon}

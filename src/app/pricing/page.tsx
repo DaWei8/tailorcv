@@ -12,7 +12,7 @@ export default function PricingPage() {
     return (
         <main className="bg-white min-h-screen pt-4 flex flex-col items-center justify-center relative text-gray-900">
             {/* <NavLanding /> */}
-            <Link href="/landing" className="font-bold text-xl">
+            <Link href="/landing" className="font-bold w-full bg-white pt-2 pb-4 flex items-center justify-center sticky top-0 text-xl">
                 <Image src={Logo} className="w-32" alt="Tailor CV logo" />
             </Link>
             <div className="max-w-6xl mx-auto text-center pt-28 px-4 lg:px-8 space-y-6">

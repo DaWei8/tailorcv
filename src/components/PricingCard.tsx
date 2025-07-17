@@ -106,10 +106,10 @@ export default function PricingCard({ plan }: PricingCardProps) {
 
                 {/* CTA */}
                 <button
-                    className={`w-full  cursor-pointer font-semibold py-3 rounded-lg transition
+                    className={`w-full cursor-pointer font-semibold py-3 rounded-lg transition
                     ${tier.accent
                             ? "bg-blue-600 text-white hover:bg-blue-700"
-                            : "bg-blue-50 text-gray-800 hover:bg-blue-100"}`}
+                            : "bg-blue-50 text-gray-800 hover:bg-blue-600 hover:text-white"}`}
                     onClick={() => alert(`Redirect to Stripe for ${tier.name}`)}
                 >
                     {tier.cta}

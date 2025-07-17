@@ -4,9 +4,10 @@ import NavLanding from "@/components/NavLanding";
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen relative transition-all ease-in-out duration-500 bg-white text-gray-900 flex flex-col items-center">
-      {/* Hero */}
+    <main className="min-h-screen h-full relative transition-all ease-in-out duration-500 bg-white text-gray-900 flex flex-col items-center">
       <NavLanding />
+
+      {/* Hero */}
       <section className="max-w-4xl text-center px-4 pt-28 space-y-6">
         <h1 className="text-4xl md:text-6xl font-extrabold">
           Get More Interviews with Resumes Tailored to the Job.

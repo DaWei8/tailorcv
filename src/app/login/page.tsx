@@ -1,41 +1,50 @@
-"use client";
+// app/login/page.tsx
+"use client"
 
-import { useEffect } from "react";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "@/lib/supabase";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useEffect } from "react"
+import { Auth } from "@supabase/auth-ui-react"
+import { ThemeSupa } from "@supabase/auth-ui-shared"
+import { createClient } from "@/lib/supabase"
+import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
-  const router = useRouter();
+  const router = useRouter()
+  const supabase = createClient()
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log("Auth state changed:", event);
-        if (event === "SIGNED_IN" || event === "USER_UPDATED" || event === "INITIAL_SESSION") {
-          console.log("User is logged in:", session?.user);
-          toast.success("Logged in successfully!");
-          router.push("/dashboard");
-          console.log(router)
+      async (event, session) => {
+        console.log('Auth event:', event, 'Session:', session)
+        
+        if (event === "SIGNED_IN") {
+          toast.success("Logged in successfully!")
+          router.push("/dashboard")
+          router.refresh() // Refresh to update server components
+        }
+        
+        if (event === "SIGNED_OUT") {
+          router.push("/login")
+          router.refresh()
         }
       }
-    );
+    )
+
     return () => {
-      authListener?.subscription.unsubscribe();
-    };
-  }, [router]);
+      authListener?.subscription.unsubscribe()
+    }
+  }, [router, supabase])
 
   return (
-    <div className="bg-gray-100 w-screen h-screen flex flex-col items-center px-4 justify-center" >
-      <div className=" max-w-lg bg-white w-full shadow-lg p-4 pt-8 lg:p-8 rounded-2xl">
-        <h1 className="text-3xl md:text-4xl text-black mb-4 font-extrabold text-center">Login to TailorCV</h1>
+    <div className="bg-gray-100 w-screen h-screen flex flex-col items-center px-4 justify-center">
+      <div className="max-w-lg bg-white w-full shadow-lg p-4 pt-8 lg:p-8 rounded-2xl">
+        <h1 className="text-3xl md:text-4xl text-black mb-4 font-extrabold text-center">
+          Login to TailorCV
+        </h1>
         <p className="text-center text-[15px] text-gray-600 mb-2">
           Sign in to tailor your resume and get more interviews.
         </p>
-        <div className=" max-w-md w-full" >
-        </div>
+        
         <Auth
           supabaseClient={supabase}
           providers={["google"]}
@@ -44,8 +53,8 @@ export default function LoginPage() {
             variables: {
               default: {
                 colors: {
-                  brand: "#2563EB",           // primary button bg
-                  brandAccent: "#2563EB",    // hover / focus
+                  brand: "#2563EB",
+                  brandAccent: "#2563EB",
                   brandButtonText: "#ffffff",
                   defaultButtonBackground: "#f3f4f6",
                   defaultButtonBackgroundHover: "#e5e7eb",
@@ -93,10 +102,9 @@ export default function LoginPage() {
             },
           }}
           showLinks={true}
-          // redirectTo={`${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`}
-          redirectTo={process.env.NEXT_PUBLIC_SITE_URL + "/dashboard" || `${window.location.origin}/dashboard`}
+          redirectTo={`${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`}
         />
       </div>
     </div>
-  );
+  )
 }
