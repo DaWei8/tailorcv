@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";   // ✅ use this
+import { createClient } from "@/lib/supabase";   // ✅ use this
 import Logo from "../../public/tailorcv_logo.svg";
 import Image from "next/image";
 
