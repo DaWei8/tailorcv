@@ -95,7 +95,6 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, childr
           aria-label={`Add new ${title}`}
         >
           <PlusCircle size={16} className="mr-2" />
-          Add {title}
         </button>
       </div>
       
