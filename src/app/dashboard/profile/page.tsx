@@ -220,7 +220,7 @@ export default function ProfilePage() {
   const TextArea = ({ className = "", ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
     <textarea 
       {...props} 
-      className={`block w-full rounded-md px-2 placeholder-gray-700 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`} 
+      className={`block w-full rounded-md px-2 placeholder-gray-300 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`} 
     />
   );
 
