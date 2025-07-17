@@ -17,7 +17,7 @@ export default function LogoutButton() {
             onClick={handleLogout}
             className="btn-danger"
         >
-            Logout
+            <i className="fa-solid fa-arrow-right-to-bracket"></i> Logout
         </button>
     );
 }

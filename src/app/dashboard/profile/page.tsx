@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from "uuid";
 /* ---------- Schemas & Types ---------- */
 import { profileSchema, experienceSchema, educationSchema, certSchema, langSchema, skillSchema } from "@/lib/profile-schemas";
 import type { ProfileForm, ExperienceForm, EducationForm, CertForm, LangForm, SkillForm } from "@/lib/profile-schemas";
+import Link from "next/link";
 
 // Ensure schemas align with form types
 const experienceArraySchema = z.object({ items: z.array(experienceSchema) });
@@ -98,7 +99,7 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, childr
           Add {title}
         </button>
       </div>
-      
+
       <div className="space-y-4">
         {fields.map((field, i) => (
           <div key={field.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -106,9 +107,9 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, childr
               {children(i, field as T & { id: string })}
             </div>
             <div className="mt-4 flex justify-end">
-              <button 
-                type="button" 
-                onClick={() => remove(i)} 
+              <button
+                type="button"
+                onClick={() => remove(i)}
                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 aria-label={`Remove ${title} item`}
               >
@@ -119,11 +120,11 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, childr
           </div>
         ))}
       </div>
-      
+
       <div className="flex justify-end">
-        <button 
-          type="button" 
-          onClick={save} 
+        <button
+          type="button"
+          onClick={save}
           className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
           Save {title}
@@ -212,23 +213,23 @@ export default function ProfilePage() {
 
   /* Common Input Component */
   const Input = ({ className = "", ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
-    <input 
-      {...props} 
-      className={`block w-full px-2 text-gray-700 placeholder-gray-300 min-h-[42px] rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`} 
+    <input
+      {...props}
+      className={`block w-full px-2 text-gray-700 placeholder-gray-300 min-h-[42px] rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`}
     />
   );
 
   const TextArea = ({ className = "", ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
-    <textarea 
-      {...props} 
-      className={`block w-full rounded-md px-2 placeholder-gray-700 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`} 
+    <textarea
+      {...props}
+      className={`block w-full rounded-md px-2 placeholder-gray-700 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`}
     />
   );
 
   const Select = ({ className = "", ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) => (
-    <select 
-      {...props} 
-      className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`} 
+    <select
+      {...props}
+      className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`}
     />
   );
 
@@ -250,17 +251,17 @@ export default function ProfilePage() {
                     <Input {...register("phone")} placeholder="Enter your phone number" />
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Professional Headline</label>
                   <Input {...register("headline")} placeholder="e.g., Senior Software Engineer" />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Professional Summary</label>
                   <TextArea {...register("summary")} rows={4} placeholder="Brief summary of your professional background" />
                 </div>
-                
+
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
@@ -271,7 +272,7 @@ export default function ProfilePage() {
                     <Input {...register("country")} placeholder="Enter your country" />
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">LinkedIn URL</label>
@@ -282,10 +283,10 @@ export default function ProfilePage() {
                     <Input {...register("website_url")} placeholder="https://yourwebsite.com" />
                   </div>
                 </div>
-                
+
                 <div className="flex justify-end">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
                     Save Basic Info
@@ -488,7 +489,10 @@ export default function ProfilePage() {
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-gray-900">Master Profile</h1>
+            <div className="text-3xl font-bold text-gray-900">
+              <Link href="/dashboard">
+                {`<`}
+              </Link> Master Profile</div>
             <div className="text-sm text-gray-500">
               Step {currentStep + 1} of {steps.length}
             </div>
@@ -506,11 +510,10 @@ export default function ProfilePage() {
                 <button
                   key={step.id}
                   onClick={() => setCurrentStep(index)}
-                  className={`${
-                    index === currentStep
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2`}
+                  className={`${index === currentStep
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2`}
                 >
                   <Icon size={16} />
                   <span>{step.title}</span>
@@ -533,24 +536,22 @@ export default function ProfilePage() {
             <button
               onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
               disabled={currentStep === 0}
-              className={`inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md ${
-                currentStep === 0
-                  ? 'text-gray-400 bg-gray-100 cursor-not-allowed'
-                  : 'text-gray-700 bg-white hover:bg-gray-50'
-              }`}
+              className={`inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md ${currentStep === 0
+                ? 'text-gray-400 bg-gray-100 cursor-not-allowed'
+                : 'text-gray-700 bg-white hover:bg-gray-50'
+                }`}
             >
               <ChevronLeft size={16} className="mr-2" />
               Previous
             </button>
-            
+
             <button
               onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
               disabled={currentStep === steps.length - 1}
-              className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md ${
-                currentStep === steps.length - 1
-                  ? 'text-gray-400 bg-gray-100 cursor-not-allowed'
-                  : 'text-white bg-blue-600 hover:bg-blue-700'
-              }`}
+              className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md ${currentStep === steps.length - 1
+                ? 'text-gray-400 bg-gray-100 cursor-not-allowed'
+                : 'text-white bg-blue-600 hover:bg-blue-700'
+                }`}
             >
               Next
               <ChevronRight size={16} className="ml-2" />
