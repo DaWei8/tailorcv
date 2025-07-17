@@ -499,7 +499,7 @@ export default function ProfilePage() {
       {/* Step Navigation */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8" aria-label="Tabs">
+          <nav className="flex lg:space-x-6 space-x-2 w-full overflow-scroll " aria-label="Tabs">
             {steps.map((step, index) => {
               const Icon = step.icon;
               return (
