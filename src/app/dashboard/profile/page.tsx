@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray } from "react-hook-form";
 import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase";
-import { PlusCircle, Trash2, ChevronLeft, ChevronRight, User, Briefcase, GraduationCap, Award, Globe, Wrench } from "lucide-react";
+import { PlusCircle, Trash2, ChevronLeft, ChevronRight, User, Briefcase, GraduationCap, Award, Globe, Wrench, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 
@@ -489,9 +489,9 @@ export default function ProfilePage() {
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div className="text-3xl font-bold text-gray-900">
+            <div className="text-3xl flex items-center justify-center gap-2 font-bold text-gray-900">
               <Link href="/dashboard">
-                {`<`}
+                <ArrowLeft />
               </Link> Master Profile</div>
             <div className="text-sm text-gray-500">
               Step {currentStep + 1} of {steps.length}
