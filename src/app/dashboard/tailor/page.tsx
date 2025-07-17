@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Loader2, Download, Eye } from "lucide-react";
+import { Loader2, Download,WandSparkles } from "lucide-react";
 
 interface ParsedJD {
   title: string;
@@ -55,16 +55,16 @@ export default function TailorPage() {
 
   return (
     <div className="max-w-4xl text-gray-900 mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Tailor a Resume</h1>
+      <h1 className="text-2xl font-bold">Tailor your Resume</h1>
 
       {/* Progress dots */}
-      <div className="flex items-center gap-2 ">
+      <div className="flex items-center gap-2 w-ull overflow-scroll">
         {steps.map((s, i) => (
           <div key={i} className="flex items-center space-x-2">
-            <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">
+            <div className="min-w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">
               {i + 1}
             </div>
-            <span className="text-sm">{s}</span>
+            <span className="text-sm w-fit">{s}</span>
             {i < steps.length - 1 && <div className="w-16 border-t border-gray-400" />}
           </div>
         ))}
@@ -84,7 +84,7 @@ export default function TailorPage() {
         disabled={loading}
         className="btn-primary flex items-center space-x-2"
       >
-        {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <Eye className="w-4 h-4" />}
+        {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <WandSparkles className="w-4 h-4" />}
         <span>{loading ? "Working…" : "Tailor Resume"}</span>
       </button>
 

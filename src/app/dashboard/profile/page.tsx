@@ -96,7 +96,6 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, childr
           aria-label={`Add new ${title}`}
         >
           <PlusCircle size={16} className="mr-2" />
-          Add {title}
         </button>
       </div>
 
@@ -220,9 +219,9 @@ export default function ProfilePage() {
   );
 
   const TextArea = ({ className = "", ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
-    <textarea
-      {...props}
-      className={`block w-full rounded-md px-2 placeholder-gray-700 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`}
+    <textarea 
+      {...props} 
+      className={`block w-full rounded-md px-2 placeholder-gray-300 border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${className}`} 
     />
   );
 
@@ -503,7 +502,7 @@ export default function ProfilePage() {
       {/* Step Navigation */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8" aria-label="Tabs">
+          <nav className="flex lg:space-x-6 space-x-2 w-full overflow-scroll " aria-label="Tabs">
             {steps.map((step, index) => {
               const Icon = step.icon;
               return (

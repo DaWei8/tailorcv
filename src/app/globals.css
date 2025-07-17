@@ -19,5 +19,5 @@ body {
   background: var(--foreground);
   color: var(--background);
   font-family: Poppins, Helvetica, sans-serif;
-  height: 100vh;
+  min-height: 100vh;
 }

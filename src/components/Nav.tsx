@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";   // ✅ use this
 import Logo from "../../public/tailorcv_logo.svg";
 import Image from "next/image";
 
-
 export default function Nav() {
   const handleLogout = async () => {
+    const supabase = createClient();      // ✅ create here
     await supabase.auth.signOut();
     window.location.href = "/login";
   };
