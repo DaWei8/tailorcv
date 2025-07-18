@@ -64,7 +64,7 @@ export default function CoverLetterPage() {
             <div className="bg-white mx-auto max-w-2xl flex flex-col gap-4 rounded-xl shadow-xl lg:p-6 p-4">
 
                 <p className="text-sm text-center bg-gray-100 p-3 rounded-lg mb-4 w-full text-gray-600">
-                    Uplaod the job description and we will craft a professional cover letter that esnures you make a lasting impression.
+                    Upload the job description and we will craft a professional cover letter that ensures you make a lasting impression.
                 </p>
                 <div className="w-full space-y-2" >
                     <Label htmlFor="job-description">Job Description</Label>

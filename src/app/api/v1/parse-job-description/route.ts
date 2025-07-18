@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: process.env.KIMI_API_KEY! });
+// Configure OpenAI client for Moonshot/Kimi API
+const openai = new OpenAI({
+  apiKey: process.env.KIMI_API_KEY!,
+  baseURL: "https://api.moonshot.cn/v1", // Moonshot API endpoint
+});
 
 // Enhanced prompt with detailed instructions and examples
 const prompt = `You are a specialized job description parser. Extract information from job descriptions and return ONLY valid JSON with the following structure:
@@ -29,12 +33,6 @@ EXTRACTION RULES:
 5. If information is not available, use null for strings or empty arrays []
 6. Clean up extracted text - remove excessive whitespace and formatting
 7. Be specific and detailed in extractions rather than generic
-
-EXAMPLES:
-- Required skill: "Python programming with 3+ years experience"
-- Responsibility: "Design and implement RESTful APIs using Node.js"
-- Qualification: "Bachelor's degree in Computer Science or related field"
-- Benefit: "Health insurance and 401k matching"
 
 Return ONLY the JSON object, no additional text or explanation.`;
 
@@ -198,7 +196,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Job description parsing error:', error);
     
-    // Handle specific OpenAI errors
+    // Handle specific API errors
     if (error instanceof Error) {
       if (error.message.includes('rate limit')) {
         return NextResponse.json(
@@ -207,9 +205,9 @@ export async function POST(req: NextRequest) {
         );
       }
       
-      if (error.message.includes('authentication')) {
+      if (error.message.includes('authentication') || error.message.includes('API key')) {
         return NextResponse.json(
-          { error: 'Authentication failed. Please check API key.' },
+          { error: 'API authentication failed. Please check your API key configuration.' },
           { status: 401 }
         );
       }

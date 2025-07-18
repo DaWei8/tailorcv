@@ -13,7 +13,6 @@ import {
   Clock,
   X,
   RefreshCw,
-  ExternalLink,
   ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
@@ -37,13 +36,21 @@ interface ToastState {
 function runATS(resumeText: string, jdText: string): ATSResult {
   const extractKeywords = (text: string): string[] => {
     const commonWords = new Set([
-      'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
-      'from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had',
-      'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must',
-      'can', 'this', 'that', 'these', 'those', 'a', 'an', 'we', 'you', 'they', 'it',
-      'he', 'she', 'him', 'her', 'his', 'their', 'our', 'my', 'your', 'years', 'year',
-      'experience', 'work', 'working', 'job', 'role', 'position', 'company', 'team'
-    ]);
+  'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+  'from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+  'have', 'has', 'had', 'do', 'does', 'did',
+  'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can',
+  'a', 'an', 'we', 'you', 'they', 'it', 'he', 'she', 'him', 'her', 'his', 'their', 'our', 'my', 'your',
+  'this', 'that', 'these', 'those',
+  'i', 'me', 'us', 'them', 'theirs', 'ours',
+  // Numbers as standalone words
+  'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+  // Soft fillers
+  'just', 'very', 'really', 'some', 'any', 'such', 'much', 'more', 'most', 'many',
+  'also', 'however', 'though', 'even', 'yet', 'still', 'while', 'although', 'because', 'so', 'than',
+  // Redundant connectors
+  'then', 'if', 'when', 'where', 'which', 'who', 'whom', 'whose', 'what', 'how'
+]);
 
     return (text.toLowerCase()
       .match(/\b[a-z]+(?:[+#]|\b)/g) || [])
@@ -292,7 +299,7 @@ export default function ATSScanner() {
       </div>
       {/* Header */}
       <div className="bg-white mb-4 w-full px-4 lg:px-8 shadow">
-        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+        <div className="max-w-7xl mx-auto ">
           <div className="flex items-center py-6">
             <div className="text-xl flex items-center justify-center gap-2 font-bold text-gray-900">
               <Link href="/dashboard">
@@ -304,33 +311,7 @@ export default function ATSScanner() {
 
         </div>
       </div>
-      <div className="w-full mx-auto flex flex-col gap-8 px-8 ">
-        {/* Disclaimer */}
-        <div className="bg-amber-50 border-l-4 max-w-7xl mx-auto border-amber-400 lg:p-4 p-3 rounded-r-lg ">
-          <div className="flex items-start gap-3">
-
-            <div>
-              <h3 className="font-semibold flex text-amber-800 mb-2">      <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0 mr-2" />Important Notice</h3>
-              <p className="text-amber-700 text-sm leading-relaxed">
-                <strong>Integrity First:</strong> Falsifying work experience or skills is fraudulent and can lead to serious consequences.
-                This tool is designed to help you optimize your <em>genuine</em> qualifications. Take time to actually develop the skills you lack.
-              </p>
-              <p className="text-amber-700 text-sm mt-2">
-                <strong>Need help planning your learning journey?</strong> Try{" "}
-                <a
-                  href="https://phasely.vercel.app/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-amber-800 font-bold hover:text-amber-900 underline inline-flex items-center gap-1"
-                >
-                  Phasely <ExternalLink size={12} />
-                </a>
-                {" "}to create structured learning plans and track your progress.
-              </p>
-            </div>
-          </div>
-        </div>
-
+      <div className="w-full mx-auto flex flex-col gap-8 lg:px-8 px-4 ">
         {/* Main Form */}
         <div className="bg-white mx-auto max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
           <p className="text-sm text-center bg-gray-100 p-3 rounded-lg mb-4 w-full text-gray-600">

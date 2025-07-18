@@ -23,7 +23,7 @@ export default function TailorPage() {
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<ResumePreview | null>(null);
 
-  const steps = ["Parse JD", "Tailor Resume", "Preview & Download"];
+  const steps = ["Paste JD", "Tailor Resume", "Preview & Download"];
 
   const handle = async () => {
     if (!jdRaw.trim()) return toast.error("Paste a job description first.");
@@ -70,7 +70,7 @@ export default function TailorPage() {
           </div>
           {/* Progress dots */}
           <div className="overflow-hidden" >
-            <div className="flex items-center pt-4 pb-3 w-full justify-center overflow-x-scroll">
+            <div className="flex lg:items-center pt-4 pb-3 w-full lg:justify-center overflow-x-scroll">
               {steps.map((s, i) => (
                 <div key={i} className="flex items-center">
                   <div className="flex items-center space-x-1 p-2 pr-3 rounded-4xl bg-blue-50">
@@ -89,62 +89,69 @@ export default function TailorPage() {
 
 
       {/* JD Input */}
-      <div className="w-full max-w-7xl flex flex-col gap-4 items-center justify-center mx-auto px-4 sm:px-6 lg:px-8" >
-        <textarea
-          value={jdRaw}
-          onChange={(e) => setJdRaw(e.target.value)}
-          rows={10}
-          placeholder="Paste the full job description here..."
-          className="w-full max-w-4xl border border-gray-400 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500"
-        />
+      <div className="bg-white mx-4 max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
+        <p className="text-sm text-center bg-gray-100 p-3 rounded-lg mb-4 w-full text-gray-600">
+          Type or paste your job description to get a tailored resume that fits perfectly for your job.
+        </p>
+        <div className="w-full flex flex-col gap-4 items-center justify-center" >
+          <textarea
+            value={jdRaw}
+            onChange={(e) => setJdRaw(e.target.value)}
+            rows={10}
+            placeholder="Paste the full job description here..."
+            className="w-full max-w-4xl border text-sm border-gray-400 rounded-lg px-3 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
 
-        <button
-          onClick={handle}
-          disabled={loading}
-          className="btn-primary flex text-sm py-3 max-w-sm w-full justify-center px-3 items-center space-x-2"
-        >
-          <span >{loading ? "Working…" : "Tailor Resume"}</span>
-          {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <WandSparkles className="w-4 h-4" />}
-        </button>
+          <button
+            onClick={handle}
+            disabled={loading}
+            className="btn-primary flex text-sm py-3 max-w-sm w-full justify-center px-3 items-center space-x-2"
+          >
+            <span >{loading ? "Working…" : "Tailor Resume"}</span>
+            {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <WandSparkles className="w-4 h-4" />}
+          </button>
 
-        {/* Preview section */}
-        {preview && (
-          <div className="border rounded p-4 space-y-4">
-            <div className="flex justify-between items-center">
+          {/* Preview section */}
+          {preview && (
+            <>
               <h2 className="text-lg font-semibold">Preview</h2>
-              <span className="text-sm font-medium text-green-600">
-                ATS Score: {preview.atsScore}%
-              </span>
-            </div>
-
-            {/* Skills highlight */}
-            <div>
-              <h3 className="text-sm font-semibold mb-2">Skills matched</h3>
-              <div className="flex flex-wrap gap-2">
-                {(preview.resume as { skills?: string[] })?.skills?.map((s, i) => (
-                  <span
-                    key={i}
-                    className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
-                  >
-                    {s}
+              <div className="border w-full rounded-lg p-4 space-y-4">
+                {/* <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-green-600">
+                    ATS Score: {preview.atsScore}%
                   </span>
-                ))}
+                </div> */}
+
+                {/* Skills highlight */}
+                <div>
+                  <h3 className="text-sm font-semibold mb-2">Skills matched</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {(preview.resume as { skills?: string[] })?.skills?.map((s, i) => (
+                      <span
+                        key={i}
+                        className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <details className="text-sm rounded-lg">
+                  <summary className="cursor-pointer">Show resume JSON</summary>
+                  <pre className="mt-2 text-xs bg-gray-100 p-2 rounded-lg overflow-auto min-h-32 max-h-60">
+                    {JSON.stringify(preview.resume, null, 2)}
+                  </pre>
+                </details>
+
+                <button onClick={download} className="btn-primary flex items-center text-sm py-2 px-3 space-x-2">
+                  <Download className="w-4 h-4" />
+                  <span>Download PDF</span>
+                </button>
               </div>
-            </div>
-
-            <details className="text-sm">
-              <summary className="cursor-pointer">Show resume JSON</summary>
-              <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto max-h-60">
-                {JSON.stringify(preview.resume, null, 2)}
-              </pre>
-            </details>
-
-            <button onClick={download} className="btn-primary flex items-center space-x-2">
-              <Download className="w-4 h-4" />
-              <span>Download PDF</span>
-            </button>
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

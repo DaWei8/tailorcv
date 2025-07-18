@@ -1,4 +1,4 @@
-import { UserCircle, FileText, MailCheck } from "lucide-react";
+import { UserCircle, FileText, MailCheck, ExternalLink, AlertCircle, ScanEye } from "lucide-react";
 import { createClient } from "@/lib/supabase-server"
 import { redirect } from "next/navigation"
 import Link from "next/link";
@@ -62,7 +62,7 @@ export default async function DashboardPage() {
 
                 {/* ATS card */}
                 <DashboardCard
-                    icon={<FileText className="w-12 h-12 text-red-600 group-hover:scale-110 transition-transform" />}
+                    icon={<ScanEye className="w-12 h-12 text-red-600 group-hover:scale-110 transition-transform" />}
                     title="ATS Score"
                     desc="Track your progress, and increase your chances of getting hired."
                     link="/dashboard/ats"
@@ -70,11 +70,35 @@ export default async function DashboardPage() {
 
                 {/*  Cover Letter card */}
                 <DashboardCard
-                    icon={<MailCheck className="w-12 h-12 text-blue-600 group-hover:scale-110 transition-transform" />}
+                    icon={<MailCheck className="w-12 h-12 text-purple-600 group-hover:scale-110 transition-transform" />}
                     title="Cover Letter"
                     desc="Craft a professional cover letter that stands out."
                     link="/dashboard/cover-letter"
                 />
+            </div>
+            {/* Disclaimer */}
+            <div className="bg-amber-50 border-l-4 max-w-7xl mx-4 lg:mx-0 border-amber-400 lg:p-5 p-3 rounded-r-lg ">
+                <div className="flex items-start gap-3">
+                    <div>
+                        <h3 className="font-bold text-xl flex text-amber-700 mb-2">      <AlertCircle className="w-5 h-5 text-amber-700 mt-0.5 flex-shrink-0 mr-2" />Important Notice</h3>
+                        <p className="text-amber-700 leading-relaxed">
+                            <strong>Integrity First:</strong> Falsifying work experience or skills is fraudulent and can lead to serious consequences.
+                            This tool is designed to help you optimize your <em>genuine</em> qualifications. Take time to actually develop the skills you lack.
+                        </p>
+                        <p className="text-amber-700 mt-2">
+                            <strong>Need help planning your learning journey?</strong> Try{" "}
+                            <a
+                                href="https://phasely.vercel.app/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-800 font-bold hover:text-blue-500 underline inline-flex items-center gap-1"
+                            >
+                                Phasely <ExternalLink size={12} />
+                            </a>
+                            {" "}to create structured learning plans and track your progress.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* <DashboardHistory /> */}
