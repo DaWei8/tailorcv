@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Loader2, Download, WandSparkles, ArrowLeft } from "lucide-react";
+import { Loader2, WandSparkles, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import DownloadResumeButton from "@/components/DownloadResumeButton";
 
 interface ParsedJD {
   title: string;
@@ -49,10 +50,10 @@ export default function TailorPage() {
     }
   };
 
-  const download = () => {
-    if (!preview) return;
-    window.open(`/api/v1/download-pdf?id=${preview.id}`, "_blank");
-  };
+  // const download = () => {
+  //   if (!preview) return;
+  //   window.open(`/api/v1/download-pdf?id=${preview.id}`, "_blank");
+  // };
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-50 text-gray-900 mx-auto space-y-6 pb-20">
@@ -144,10 +145,12 @@ export default function TailorPage() {
                   </pre>
                 </details>
 
+                <DownloadResumeButton resumeId={preview.id} />
+{/* 
                 <button onClick={download} className="btn-primary flex items-center text-sm py-2 px-3 space-x-2">
                   <Download className="w-4 h-4" />
                   <span>Download PDF</span>
-                </button>
+                </button> */}
               </div>
             </>
           )}

@@ -36,20 +36,7 @@ interface ToastState {
 function runATS(resumeText: string, jdText: string): ATSResult {
   const extractKeywords = (text: string): string[] => {
     const commonWords = new Set([
-  'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
-  'from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
-  'have', 'has', 'had', 'do', 'does', 'did',
-  'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can',
-  'a', 'an', 'we', 'you', 'they', 'it', 'he', 'she', 'him', 'her', 'his', 'their', 'our', 'my', 'your',
-  'this', 'that', 'these', 'those',
-  'i', 'me', 'us', 'them', 'theirs', 'ours',
-  // Numbers as standalone words
-  'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
-  // Soft fillers
-  'just', 'very', 'really', 'some', 'any', 'such', 'much', 'more', 'most', 'many',
-  'also', 'however', 'though', 'even', 'yet', 'still', 'while', 'although', 'because', 'so', 'than',
-  // Redundant connectors
-  'then', 'if', 'when', 'where', 'which', 'who', 'whom', 'whose', 'what', 'how'
+  'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by','from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being','have', 'has', 'had', 'do', 'does', 'did','will', 'would', 'could', 'should', 'may', 'might', 'must', 'can','a', 'an', 'we', 'you', 'they', 'it', 'he', 'she', 'him', 'her', 'his', 'their', 'our', 'my', 'your','this', 'that', 'these', 'those','i', 'me', 'us', 'them', 'theirs', 'ours','one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten','just', 'very','really', 'some', 'any', 'such', 'much', 'more', 'most', 'many','also', 'however', 'though', 'even', 'yet', 'still', 'while', 'although', 'because', 'so', 'than','then', 'if', 'when', 'where', 'which', 'who', 'whom', 'whose', 'what', 'how'
 ]);
 
     return (text.toLowerCase()
