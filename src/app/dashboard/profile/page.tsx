@@ -488,12 +488,12 @@ export default function ProfilePage() {
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div className="text-xl flex items-center justify-center gap-2 font-bold text-gray-900">
-              <Link href="/dashboard">
-                <ArrowLeft />
-              </Link>
+            <Link className="w-8 h-8 text-gray-700" href="/dashboard">
+              <ArrowLeft />
+            </Link>
+            <h1 className="text-xl flex items-center justify-center font-bold text-gray-900">
               Master Profile
-            </div>
+            </h1>
             <div className="text-sm text-gray-500">
               Step {currentStep + 1} of {steps.length}
             </div>
@@ -504,7 +504,7 @@ export default function ProfilePage() {
       {/* Step Navigation */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center justify-center lg:space-x-6 space-x-4 w-full overflow-x-scroll " aria-label="Tabs">
+          <nav className="flex items-center md:justify-center lg:space-x-6 space-x-4 w-full overflow-x-scroll " aria-label="Tabs">
             {steps.map((step, index) => {
               const Icon = step.icon;
               return (

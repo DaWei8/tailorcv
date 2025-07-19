@@ -8,8 +8,24 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from 
 import { ArrowLeft, Loader2, WandSparkles, FileText, X, Check } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import UserMenu from "@/components/UserMenu";
+// import { createClient } from "@/lib/supabase-server";
+// import { redirect } from "next/navigation";
+// import { queryUserId } from "@/lib/queryUserId";
+// import { User } from "@supabase/supabase-js";
 
 // Storage utilities for job description
+// const user = await queryUserId() as User;
+
+// const supabase = await createClient()
+
+// const {
+//     data: { user },
+// } = await supabase.auth.getUser()
+
+
+
+
 const JD_STORAGE_KEY = "saved_job_description";
 const COVER_LETTER_STORAGE_KEY = "generated_cover_letters";
 
@@ -25,6 +41,7 @@ interface SavedCoverLetter {
     jobDescription: string;
     createdAt: string;
 }
+
 
 const jobDescriptionStorage = {
     save: (jdText: string) => {
@@ -89,6 +106,10 @@ const coverLetterStorage = {
 };
 
 export default function CoverLetterPage() {
+
+    // if (!user) {
+    //     redirect('/dashboard')
+    // }
     const [jobDescription, setJobDescription] = useState("");
     const [loading, setLoading] = useState(false);
     const [coverLetter, setCoverLetter] = useState("");
@@ -96,6 +117,8 @@ export default function CoverLetterPage() {
     const [showJDModal, setShowJDModal] = useState(false);
     const [savedJD, setSavedJD] = useState<SavedJobDescription | null>(null);
     const [isInitialized, setIsInitialized] = useState(false);
+
+
 
     // Load saved job description on component mount
     useEffect(() => {
@@ -282,32 +305,40 @@ export default function CoverLetterPage() {
             <div className="bg-white w-full shadow">
                 <div className="max-w-7xl w-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center py-6">
-                        <div className="text-xl flex items-center gap-2 font-bold text-gray-900">
-                            <Link href="/dashboard">
-                                <ArrowLeft />
-                            </Link>
+                        <Link className="w-[30%]" href="/dashboard">
+                            <ArrowLeft />
+                        </Link>
+                        <div className="text-xl flex items-center font-bold text-gray-900">
                             Craft Cover Letter
                         </div>
 
                         {/* Clear saved data button */}
-                        {savedJD && (
-                            <button
-                                onClick={() => {
-                                    jobDescriptionStorage.clear();
-                                    setSavedJD(null);
-                                    toast.success("Saved job description cleared");
-                                }}
-                                className="text-sm text-red-600 hover:text-red-800 transition-colors"
-                            >
-                                Clear Saved JD
-                            </button>
+                        {savedJD ? (
+                            <div className="w-[30%] flex items-center justify-end gap-2">
+                                <button
+                                    onClick={() => {
+                                        jobDescriptionStorage.clear();
+                                        setSavedJD(null);
+                                        toast.success("Saved job description cleared");
+                                    }}
+                                    className="text-sm text-red-600 hover:text-red-800 transition-colors"
+                                >
+                                    Clear Saved JD
+                                </button>
+                                <UserMenu />
+                            </div>
+                        ) : (
+                            <div className="w-[30%] flex items-center justify-end gap-2" >
+
+                                <UserMenu />
+                            </div>
                         )}
                     </div>
                 </div>
             </div>
 
+            <h2 className="text-2xl font-bold w-full mb-2 text-gray-700 text-center ">Paste Your Job Description</h2>
             <div className="bg-white mx-auto max-w-2xl flex flex-col gap-4 rounded-xl shadow-xl lg:p-6 p-4">
-                <h2 className="text-lg w-full mb-2 text-center font-semibold">Paste Your Job Description</h2>
 
                 {/* Auto-save indicator */}
                 {jobDescription.trim() && isInitialized && (

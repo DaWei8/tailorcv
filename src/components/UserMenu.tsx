@@ -1,20 +1,41 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { User } from "@supabase/supabase-js"
 import { createClient } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-// import Logo from "../../public/logo.svg"
-// import Link from "next/link"
 
-export default function UserMenu({ user }: { user: User }) {
+export default function UserMenu() {
   const [showMenu, setShowMenu] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    // Get initial user
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      setLoading(false)
+    }
+
+    getUser()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null)
+        setLoading(false)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [supabase.auth])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -22,23 +43,29 @@ export default function UserMenu({ user }: { user: User }) {
     router.push("/login")
   }
 
+  // Don't render anything while loading
+  if (loading) {
+    return (
+      <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
+    )
+  }
+
+  // Don't render if no user is logged in
+  if (!user) {
+    return null
+  }
+
   return (
     <div className="relative">
       {/* Header */}
-      <div className="bg-white w-full shadow">
+      <div className="bg-white w-full">
         <div className="w-full flex flex-col items-center justify-center mx-auto">
-          <div className="flex justify-between w-full items-center px-4 pt-4 pb-4">
-            {/* <div className="flex items-end gap-2">
-              <Link href="/dashboard" className="font-bold text-xl">
-                <Image src={Logo} className="w-24" alt="Tailor CV logo" />
-              </Link>
-              <p className="px-2 py-1 text-green-600 font-medium bg-green-100 w-fit text-[12px] border border-green-300 rounded-full">
-                Free plan
-              </p>
-            </div> */}
-
+          <div className="flex justify-between w-full items-center">
             {/* Profile */}
-            <button title="clickable profile image button" onClick={() => setShowMenu(!showMenu)}>
+            <button 
+              title="clickable profile image button" 
+              onClick={() => setShowMenu(!showMenu)}
+            >
               <Image
                 src={user?.user_metadata?.avatar_url || "/placeholder.jpg"}
                 alt="user profile image"

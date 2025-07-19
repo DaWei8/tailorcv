@@ -7,6 +7,20 @@ import Link from "next/link";
 import DownloadResumeButton from "@/components/DownloadResumeButton";
 import ResumePDF from "@/lib/pdf-template";
 import { ResumeData, Skill } from "@/lib/schemas";
+import UserMenu from "@/components/UserMenu";
+// import { createClient } from "@/lib/supabase-server";
+// import { redirect } from "next/navigation";
+// import { queryUserId } from "@/lib/queryUserId";
+// import { User } from "@supabase/supabase-js";
+
+
+
+// const supabase = await createClient()
+
+// const {
+//   data: { user },
+// } = await supabase.auth.getUser()
+
 
 interface ParsedJD {
   title: string;
@@ -84,12 +98,16 @@ const storageUtils = {
 };
 
 export default function TailorPage() {
+
+  // if (!user) {
+  //   redirect('/dashboard')
+  // }
   const [jdRaw, setJdRaw] = useState("");
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<ResumePreview | null>(null);
   const [isLoadingFromStorage, setIsLoadingFromStorage] = useState(true);
 
-  const steps = ["Paste JD", "Tailor Resume", "Preview & Download"];
+  // const steps = ["Paste the Job Info", "Tailor Your Resume", "Preview & Download", "Generate Cover Letter"];
 
   // Load saved data on component mount
   useEffect(() => {
@@ -153,10 +171,10 @@ export default function TailorPage() {
       };
 
       setPreview(resumeWithMetadata);
-      
+
       // Save job description for cover letter use
       jobDescriptionStorage.save(jdRaw);
-      
+
       toast.success("Resume ready!");
     } catch (error) {
       console.error('Tailoring error:', error);
@@ -201,33 +219,39 @@ export default function TailorPage() {
       <div className="bg-white w-full shadow">
         <div className="max-w-7xl w-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div className="text-xl flex items-center gap-2 font-bold text-gray-900">
-              <Link href="/dashboard">
-                <ArrowLeft />
-              </Link>
+
+            <Link className="w-[30%]" href="/dashboard">
+              <ArrowLeft />
+            </Link>
+            <h1 className="text-xl flex items-center font-bold text-gray-900">
               Tailor Resume
-            </div>
+            </h1>
 
             {/* Clear storage button */}
-            {preview && (
-              <button
-                onClick={clearStoredData}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                title="Clear stored resume data"
-              >
-                <Trash2 className="w-4 h-4" />
-                Clear Data
-              </button>
+            {preview ? (
+              <div className="flex items-center justify-end w-[30%] gap-2 float-right" >
+                <button
+                  onClick={clearStoredData}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Clear stored resume data"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Clear Data
+                </button>
+                <UserMenu  />
+              </div>
+            ) : (
+              <UserMenu />
             )}
           </div>
 
           {/* Progress dots */}
-          <div className="overflow-hidden">
+          {/* <div className="overflow-hidden">
             <div className="flex md:items-center pt-4 pb-3 w-full lg:justify-center overflow-x-scroll">
               {steps.map((s, i) => (
                 <div key={i} className="flex items-center">
                   <div className="flex items-center space-x-1 p-2 pr-3 rounded-4xl bg-blue-50">
-                    <div className="min-w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center">
+                    <div className="min-w-6 h-6 rounded-full bg-gray-600 text-white text-xs flex items-center justify-center">
                       {i + 1}
                     </div>
                     <span className="text-sm text-gray-800 text-nowrap">{s}</span>
@@ -236,7 +260,7 @@ export default function TailorPage() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -259,9 +283,9 @@ export default function TailorPage() {
       )}
 
       {/* JD Input */}
+      <h2 className="text-2xl font-bold w-full mb-2 text-center ">Paste Job Description</h2>
       <div className="bg-white mx-4 w-full max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
-        <h2 className="text-2xl font-bold w-full mb-2 text-center ">Paste Job Description</h2>
-        
+
         {/* Auto-save indicator */}
         {jdRaw.trim() && !isLoadingFromStorage && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-2 mb-4">
@@ -270,7 +294,7 @@ export default function TailorPage() {
             </p>
           </div>
         )}
-        
+
         <div className="w-full flex flex-col gap-4 items-center justify-center">
           <textarea
             value={jdRaw}
@@ -328,13 +352,13 @@ export default function TailorPage() {
                     resumeData={preview.resume}
                     fileName={`tailored-resume-${Date.now()}.pdf`}
                   />
-                  
+
                   {/* Quick link to cover letter generation */}
-                  <Link 
-                    href="/cover-letter" 
-                    className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors text-center"
+                  <Link
+                    href="/dashboard/cover-letter"
+                    className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg font-medium hover:bg-green-700 transition-colors text-center"
                   >
-                    Generate Cover Letter →
+                    Generate Cover Letter
                   </Link>
                 </div>
               </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Logo from "../../../public/logo.svg";
 import Image from "next/image";
 import UserMenu from "@/components/UserMenu";
+// import { queryUserId } from "@/lib/queryUserId";
 
 const resumeCards = [
     {
@@ -66,12 +67,14 @@ const resumeCards = [
 
 
 export default async function DashboardPage() {
+
+
     const supabase = await createClient()
 
     const {
         data: { user },
     } = await supabase.auth.getUser()
-    // console.log(user)
+
 
     if (!user) {
         redirect('/login')
@@ -90,7 +93,7 @@ export default async function DashboardPage() {
                             <p className="px-2 py-1 text-green-600 font-medium bg-green-100 w-fit text-[12px] border border-green-300 rounded-full" >Free plan</p>
                         </div>
                         {/* <LogoutButton /> */}
-                        <UserMenu user={user} />
+                        <UserMenu />
                     </div>
                 </div>
             </div>

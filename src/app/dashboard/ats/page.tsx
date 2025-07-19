@@ -13,10 +13,20 @@ import {
   Clock,
   X,
   RefreshCw,
-  ArrowLeft
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
+// import { queryUserId } from "@/lib/queryUserId";
+// import { User } from "@supabase/supabase-js";
+import UserMenu from "@/components/UserMenu";
+// import { createClient } from "@/lib/supabase-server";
+// import { redirect } from "next/navigation";
 
+// const supabase = await createClient()
+
+// const {
+//     data: { user },
+// } = await supabase.auth.getUser()
 
 interface ATSResult {
   score: number;
@@ -33,7 +43,6 @@ interface ToastState {
   type: "success" | "error" | "warning";
   id: number;
 }
-
 function runATS(resumeText: string, jdText: string): ATSResult {
 
 
@@ -166,6 +175,9 @@ truthfully represents your experience and qualifications.
 }
 
 export default function ATSScanner() {
+      // if (!user) {
+      //     redirect('/dashboard')
+      // }
 
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
@@ -341,12 +353,16 @@ export default function ATSScanner() {
       {/* Header */}
       <div className="bg-white mb-4 w-full px-4 lg:px-8 shadow">
         <div className="max-w-7xl mx-auto ">
-          <div className="flex items-center py-6">
-            <div className="text-xl flex items-center justify-center gap-2 font-bold text-gray-900">
-              <Link href="/dashboard">
-                <ArrowLeft />
-              </Link>
-              ATS Resume Scanner
+          <div className="flex justify-between text-gray-700 items-center py-6">
+
+            <Link className="w-[30%]" href="/dashboard">
+              <ArrowLeft />
+            </Link>
+            <h1 className="text-xl flex items-center font-bold text-gray-900">
+              ATS score
+            </h1>
+            <div className="w-[30%] flex items-center justify-end " >
+              <UserMenu />
             </div>
           </div>
 
@@ -354,6 +370,8 @@ export default function ATSScanner() {
       </div>
       <div className="w-full mx-auto flex flex-col gap-8 lg:px-8 px-4 ">
         {/* Main Form */}
+        <h2 className="text-2xl font-bold w-full mb-2 text-gray-700 text-center ">Fix and Upgrade your resume</h2>
+
         <div className="bg-white mx-auto max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
           <p className="text-sm text-center bg-gray-100 p-3 rounded-lg mb-4 w-full text-gray-600">
             Upload your resume and job description to get an instant ATS compatibility score
