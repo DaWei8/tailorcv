@@ -1,11 +1,67 @@
-import { UserCircle, FileText, MailCheck, ExternalLink, AlertCircle, ScanEye } from "lucide-react";
+import { UserCircle, FileText, MailCheck, ExternalLink, AlertCircle, ScanEye, Book, Puzzle } from "lucide-react";
 import { createClient } from "@/lib/supabase-server"
 import { redirect } from "next/navigation"
 import Link from "next/link";
 import Logo from "../../../public/tailorcv_logo.svg";
 import Image from "next/image";
-// import LogoutButton from "@/components/LogoutButton";
-// import DashboardHistory from "@/components/DashboardHistory";
+
+const resumeCards = [
+    {
+        title: "Master Profile",
+        desc: "Keep your skills, experience & achievements up to date.",
+        link: "/dashboard/profile",
+        icon: (
+            <UserCircle className="w-12 h-12 text-blue-600 group-hover:scale-110 transition-transform" />
+        ),
+        comingSoon: false,
+    },
+    {
+        title: "Tailor Resume",
+        desc: "Paste any job description and get a perfect resume in seconds.",
+        link: "/dashboard/tailor",
+        icon: (
+            <FileText className="w-12 h-12 text-green-600 group-hover:scale-110 transition-transform" />
+        ),
+        comingSoon: false,
+    },
+    {
+        title: "ATS Score",
+        desc: "Track your progress, and increase your chances of getting hired.",
+        link: "/dashboard/ats",
+        icon: (
+            <ScanEye className="w-12 h-12 text-red-600 group-hover:scale-110 transition-transform" />
+        ),
+        comingSoon: false,
+    },
+    {
+        title: "Cover Letter",
+        desc: "Craft a professional cover letter that stands out.",
+        link: "/dashboard/cover-letter",
+        icon: (
+            <MailCheck className="w-12 h-12 text-purple-600 group-hover:scale-110 transition-transform" />
+        ),
+        comingSoon: false,
+    },
+    {
+        title: "Academic CV",
+        desc: "Perfect for research and academic positions.",
+        link: "#",
+        icon: (
+            <Book className="w-12 h-12 text-yellow-600 group-hover:scale-110 transition-transform" />
+        ),
+        comingSoon: true,
+    },
+    {
+        title: "Freestyle Builder",
+        desc: "Design your resume section by section your way.",
+        link: "#",
+        icon: (
+            <Puzzle className="w-12 h-12 text-pink-600 group-hover:scale-110 transition-transform" />
+        ),
+        comingSoon: true,
+    },
+];
+
 
 
 export default async function DashboardPage() {
@@ -44,43 +100,22 @@ export default async function DashboardPage() {
             </div>
 
             <div className="grid 2xl:grid-cols-3 max-w-7xl md:grid-cols-2 place-items-center px-4 gap-5">
-                {/* Profile card */}
-                <DashboardCard
-                    icon={<UserCircle className="w-12 h-12 text-blue-600 group-hover:scale-110 transition-transform" />}
-                    title="Master Profile"
-                    desc="Keep your skills, experience & achievements up to date."
-                    link="/dashboard/profile"
-                />
-
-                {/* Tailor card */}
-                <DashboardCard
-                    icon={<FileText className="w-12 h-12 text-green-600 group-hover:scale-110 transition-transform" />}
-                    title="Tailor Resume"
-                    desc="Paste any job description and get a perfect resume in seconds."
-                    link="/dashboard/tailor"
-                />
-
-                {/* ATS card */}
-                <DashboardCard
-                    icon={<ScanEye className="w-12 h-12 text-red-600 group-hover:scale-110 transition-transform" />}
-                    title="ATS Score"
-                    desc="Track your progress, and increase your chances of getting hired."
-                    link="/dashboard/ats"
-                />
-
-                {/*  Cover Letter card */}
-                <DashboardCard
-                    icon={<MailCheck className="w-12 h-12 text-purple-600 group-hover:scale-110 transition-transform" />}
-                    title="Cover Letter"
-                    desc="Craft a professional cover letter that stands out."
-                    link="/dashboard/cover-letter"
-                />
+                {resumeCards.map((card, index) => (
+                    <DashboardCard
+                        key={index}
+                        icon={card.icon}
+                        title={card.title}
+                        desc={card.desc}
+                        link={card.link}
+                        comingSoon={card.comingSoon}
+                    />
+                ))}
             </div>
             {/* Disclaimer */}
-            <div className="bg-amber-50 text-md border-l-4 max-w-7xl mx-4 lg:mx-0 border-amber-400 lg:p-5 p-3 rounded-r-lg ">
+            <div className="bg-amber-50 text-md max-w-7xl mx-4 lg:mx-0 border-amber-400 lg:p-5 p-3 rounded-lg ">
                 <div className="flex items-start  gap-3">
                     <div>
-                        <h3 className="font-bold flex text-amber-700 mb-2">      <AlertCircle className="w-5 h-5 text-amber-700 mt-0.5 flex-shrink-0 mr-2" />Important Notice</h3>
+                        <h3 className="font-bold text-lg flex text-amber-700 mb-2">      <AlertCircle className="w-5 h-5 text-amber-700 mt-0.5 flex-shrink-0 mr-2" />Important Notice</h3>
                         <p className="text-amber-700 text-md leading-relaxed">
                             <strong>Integrity First:</strong> Falsifying work experience or skills is fraudulent and can lead to serious consequences.
                             This tool is designed to help you optimize your <em>genuine</em> qualifications. Take time to actually develop the skills you lack.
@@ -110,23 +145,34 @@ function DashboardCard({
     icon,
     title,
     desc,
-    link
+    link,
+    comingSoon = false,
 }: {
     icon: React.ReactNode;
     title: string;
     desc: string;
     link: string;
+    comingSoon?: boolean;
 }) {
-    return (
-        <Link
-            href={link}
-            className="group flex flex-col w-full h-full rounded-2xl shadow-xl max-w-md bg-white shadow-gray-200 py-10 items-center text-center space-y-3 hover:shadow-2xl hover:border-blue-600 hover:shadow-blue-200 hover:scale-105 transition"
+    const CardContent = (
+        <div
+            className={`relative flex flex-col w-full h-full rounded-2xl shadow-xl max-w-md bg-white shadow-gray-200 py-10 items-center text-center space-y-3
+        ${comingSoon ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-2xl hover:border-blue-600 hover:shadow-blue-200 hover:scale-105 transition'}
+      `}
         >
-            <div className="p-3 bg-blue-50 w-14 max-h-14 group-hover:scale-110 transition-transform flex items-center justify-center text-white rounded-full" >
+            {comingSoon && (
+                <div className="absolute inset-0 bg-white/70 z-10 flex items-center justify-center rounded-2xl">
+                    <span className="text-lg font-semibold text-gray-900">Coming Soon</span>
+                </div>
+            )}
+
+            <div className="p-3 bg-blue-50 w-14 max-h-14 flex items-center justify-center text-white rounded-full group-hover:scale-110 transition-transform z-0">
                 {icon}
             </div>
-            <h3 className=" text-lg lg:text-xl font-bold">{title}</h3>
-            <p className="text-gray-600 text-sm lg:text-base w-[70%] lg:w-[75%]">{desc}</p>
-        </Link>
-    )
+            <h3 className="text-lg lg:text-xl font-bold z-0">{title}</h3>
+            <p className="text-gray-600 text-sm lg:text-base w-[70%] lg:w-[75%] z-0">{desc}</p>
+        </div>
+    );
+
+    return comingSoon ? CardContent : <Link href={link}>{CardContent}</Link>;
 }
