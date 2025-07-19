@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { Loader2, WandSparkles, ArrowLeft } from "lucide-react";
+import { Loader2, WandSparkles, ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
 import DownloadResumeButton from "@/components/DownloadResumeButton";
+import ResumePDF from "@/lib/pdf-template";
+import { ResumeData, Skill } from "@/lib/schemas";
 
 interface ParsedJD {
   title: string;
@@ -15,16 +17,85 @@ interface ParsedJD {
 
 interface ResumePreview {
   id: string;
-  resume: unknown;
-  atsScore: number;
+  resume: ResumeData;
+  jobDescription?: ParsedJD;
+  createdAt: string;
 }
 
+// Storage utilities (replace with localStorage in your actual project)
+const STORAGE_KEY = "tailored_resume_data";
+
+const storageUtils = {
+  save: (data: ResumePreview) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      console.log('Resume data saved to localStorage');
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  },
+
+  load: (): ResumePreview | null => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        console.log('Resume data loaded from localStorage');
+        return parsed;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+      return null;
+    }
+  },
+
+  clear: () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      console.log('Resume data cleared from localStorage');
+    } catch (error) {
+      console.error('Error clearing localStorage:', error);
+    }
+  }
+
+};
+
 export default function TailorPage() {
+
   const [jdRaw, setJdRaw] = useState("");
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<ResumePreview | null>(null);
+  const [isLoadingFromStorage, setIsLoadingFromStorage] = useState(true);
 
   const steps = ["Paste JD", "Tailor Resume", "Preview & Download"];
+
+  // Load saved data on component mount
+  useEffect(() => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    const loadSavedData = () => {
+      const savedData = storageUtils.load();
+      if (savedData) {
+        setPreview(savedData);
+        // Optionally restore the job description text too
+        if (savedData.jobDescription) {
+          // save the original JD text too
+          // setJdRaw(savedData.jobDescription);
+        }
+        toast.success("Restored your previous resume!");
+      }
+      setIsLoadingFromStorage(false);
+    };
+
+    loadSavedData();
+  }, [isLoadingFromStorage]);
+
+  // Save to storage whenever preview changes
+  useEffect(() => {
+    if (preview && !isLoadingFromStorage) {
+      storageUtils.save(preview);
+    }
+  }, [preview, isLoadingFromStorage]);
 
   const handle = async () => {
     if (!jdRaw.trim()) return toast.error("Paste a job description first.");
@@ -41,19 +112,50 @@ export default function TailorPage() {
         body: JSON.stringify({ jobDescription: parsed }),
       }).then((r) => r.json());
 
-      setPreview(tailor);
+      // Add metadata for storage
+      const resumeWithMetadata: ResumePreview = {
+        ...tailor,
+        jobDescription: parsed,
+        createdAt: new Date().toISOString()
+      };
+
+      setPreview(resumeWithMetadata);
       toast.success("Resume ready!");
-    } catch {
+    } catch (error) {
+      console.error('Tailoring error:', error);
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  // const download = () => {
-  //   if (!preview) return;
-  //   window.open(`/api/v1/download-pdf?id=${preview.id}`, "_blank");
-  // };
+  const clearStoredData = () => {
+    storageUtils.clear();
+    setPreview(null);
+    setJdRaw("");
+    toast.success("Cleared stored resume data");
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (isLoadingFromStorage) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="animate-spin w-5 h-5" />
+          <span>Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-50 text-gray-900 mx-auto space-y-6 pb-20">
@@ -68,10 +170,23 @@ export default function TailorPage() {
               </Link>
               Tailor Resume
             </div>
+
+            {/* Clear storage button */}
+            {preview && (
+              <button
+                onClick={clearStoredData}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                title="Clear stored resume data"
+              >
+                <Trash2 className="w-4 h-4" />
+                Clear Data
+              </button>
+            )}
           </div>
+
           {/* Progress dots */}
-          <div className="overflow-hidden" >
-            <div className="flex lg:items-center pt-4 pb-3 w-full lg:justify-center overflow-x-scroll">
+          <div className="overflow-hidden">
+            <div className="flex md:items-center pt-4 pb-3 w-full lg:justify-center overflow-x-scroll">
               {steps.map((s, i) => (
                 <div key={i} className="flex items-center">
                   <div className="flex items-center space-x-1 p-2 pr-3 rounded-4xl bg-blue-50">
@@ -80,7 +195,7 @@ export default function TailorPage() {
                     </div>
                     <span className="text-sm text-gray-800 text-nowrap">{s}</span>
                   </div>
-                  {i < steps.length - 1 && <div className="w-6 lg:w-16 border-t border-2 border-blue-100" />}
+                  {i < steps.length - 1 && <div className="w-6 lg:w-6 border-t border-2 border-blue-100" />}
                 </div>
               ))}
             </div>
@@ -88,46 +203,58 @@ export default function TailorPage() {
         </div>
       </div>
 
+      {/* Restored data notification */}
+      {preview && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3 mx-4 w-full max-w-2xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-green-800">
+                <span className="font-medium">Resume restored!</span> Last generated on {formatDate(preview.createdAt)}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* JD Input */}
-      <div className="bg-white mx-4 max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
-        <p className="text-sm text-center bg-gray-100 p-3 rounded-lg mb-4 w-full text-gray-600">
-          Type or paste your job description to get a tailored resume that fits perfectly for your job.
-        </p>
-        <div className="w-full flex flex-col gap-4 items-center justify-center" >
+      <div className="bg-white mx-4 w-full max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
+        <h2 className="text-lg w-full mb-2 text-center font-semibold">Paste Job Description</h2>
+        <div className="w-full flex flex-col gap-4 items-center justify-center">
           <textarea
             value={jdRaw}
             onChange={(e) => setJdRaw(e.target.value)}
             rows={10}
-            placeholder="Paste the full job description here..."
-            className="w-full max-w-4xl border text-sm border-gray-400 rounded-lg px-3 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Paste your job description to instantly generate a tailored resume that aligns perfectly with the role."
+            className="w-full max-w-4xl  h-full max-h-h-72 border text-sm border-gray-400 rounded-lg px-3 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <button
             onClick={handle}
             disabled={loading}
-            className="btn-primary flex text-sm py-3 max-w-sm w-full justify-center px-3 items-center space-x-2"
+            className="btn-primary rounded-lg flex text-base py-2 w-fit justify-center px-3 items-center space-x-2"
           >
-            <span >{loading ? "Working…" : "Tailor Resume"}</span>
+            <span>{loading ? "Tailoring…" : "Tailor Your Resume"}</span>
             {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <WandSparkles className="w-4 h-4" />}
           </button>
 
           {/* Preview section */}
           {preview && (
-            <>
-              <h2 className="text-lg font-semibold">Preview</h2>
-              <div className="border w-full rounded-lg p-4 space-y-4">
-                {/* <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-green-600">
-                    ATS Score: {preview.atsScore}%
+            <div className="w-full flex mt-10 flex-col gap-4 items-center justify-center">
+              <div className="flex items-center justify-between w-full">
+                <h2 className="text-lg font-semibold">Preview resume</h2>
+                {preview.createdAt && (
+                  <span className="text-xs text-gray-500">
+                    Generated: {formatDate(preview.createdAt)}
                   </span>
-                </div> */}
+                )}
+              </div>
 
+              <div className=" w-full flex flex-col items-center rounded-lg space-y-4">
                 {/* Skills highlight */}
-                <div>
+                <div className="w-full p-2 rounded-lg bg-gray-50">
                   <h3 className="text-sm font-semibold mb-2">Skills matched</h3>
                   <div className="flex flex-wrap gap-2">
-                    {(preview.resume as { skills?: string[] })?.skills?.map((s, i) => (
+                    {(preview.resume.skills.map((s: Skill) => s.skill) as { skills?: string[] })?.skills?.map((s, i) => (
                       <span
                         key={i}
                         className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
@@ -138,21 +265,21 @@ export default function TailorPage() {
                   </div>
                 </div>
 
-                <details className="text-sm rounded-lg">
-                  <summary className="cursor-pointer">Show resume JSON</summary>
-                  <pre className="mt-2 text-xs bg-gray-100 p-2 rounded-lg overflow-auto min-h-32 max-h-60">
-                    {JSON.stringify(preview.resume, null, 2)}
-                  </pre>
-                </details>
+                <div className="text-sm w-full min-h-[80vh] rounded-lg">
+                  {/* <pre className="mt-2 text-xs w-full bg-gray-100 p-2 rounded-lg overflow-auto min-h-32 max-h-60">
+                    {JSON.stringify(preview.resume, null, 1)}
+                  </pre> */}
+                  <div className="border rounded-lg " >
+                    <ResumePDF data={preview.resume} />
+                  </div>
+                </div>
 
-                <DownloadResumeButton resumeId={preview.id} />
-{/* 
-                <button onClick={download} className="btn-primary flex items-center text-sm py-2 px-3 space-x-2">
-                  <Download className="w-4 h-4" />
-                  <span>Download PDF</span>
-                </button> */}
+                <DownloadResumeButton
+                  resumeData={preview.resume}
+                  fileName={`tailored-resume-${Date.now()}.pdf`}
+                />
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

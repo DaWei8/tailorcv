@@ -17,18 +17,27 @@ interface APIError extends Error {
 function isAPIError(error: unknown): error is APIError {
   return (
     error instanceof Error &&
-    ("status" in error || "code" in error || "type" in error || "response" in error)
+    ("status" in error ||
+      "code" in error ||
+      "type" in error ||
+      "response" in error)
   );
 }
 
 export async function POST(request: NextRequest) {
   try {
     // Check if API key is configured
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "undefined") {
-      console.error("GEMINI_API_KEY is missing or undefined in environment variables.");
+    if (
+      !process.env.GEMINI_API_KEY ||
+      process.env.GEMINI_API_KEY === "undefined"
+    ) {
+      console.error(
+        "GEMINI_API_KEY is missing or undefined in environment variables."
+      );
       return NextResponse.json(
         {
-          error: "Gemini API key is missing or not set in the backend environment.",
+          error:
+            "Gemini API key is missing or not set in the backend environment.",
         },
         { status: 500 }
       );
@@ -39,7 +48,7 @@ export async function POST(request: NextRequest) {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
-    
+
     if (userError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -64,7 +73,40 @@ export async function POST(request: NextRequest) {
       .select("*")
       .eq("profile_id", user.id);
 
-    if (profileError || experienceError) {
+    const { data: skills, error: skillError } = await supabase
+      .from("skills")
+      .select("*")
+      .eq("profile_id", user.id);
+
+    const { data: education, error: educationError } = await supabase
+      .from("education")
+      .select("*")
+      .eq("profile_id", user.id);
+
+    const { data: certifications, error: certificationError } = await supabase
+      .from("certifications")
+      .select("*")
+      .eq("profile_id", user.id);
+
+    const { data: languages, error: languageError } = await supabase
+      .from("languages")
+      .select("*")
+      .eq("profile_id", user.id);
+
+    const { data: projects, error: projectsError } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("profile_id", user.id);
+
+    if (
+      profileError ||
+      experienceError ||
+      skillError ||
+      educationError ||
+      certificationError ||
+      languageError ||
+      projectsError
+    ) {
       return NextResponse.json(
         { error: "Failed to fetch user profile or experiences" },
         { status: 500 }
@@ -72,63 +114,116 @@ export async function POST(request: NextRequest) {
     }
 
     const prompt = `
-      You are a professional resume writer. The best there is.
-      Given this user profile: ${JSON.stringify(
-        { ...profile, experiences },
-        null,
-        2
-      )}
-      And this job description: ${JSON.stringify(jobDescription, null, 2)}
-      Generate a tailored resume JSON with the following structure with reference to the profile and job description:
-      {
-        "name": "Full Name",
-        "email": "Email Address",
-        "phone": "Phone Number (if available)",
-        "location": "City, Country (if available)",
-        "summary": "Tailored professional summary",
-        "skills": ["Relevant skills as presented in the profile"],
-        "languages": ["Languages spoken (if applicable) from profile"],
-        "certifications": [
-          {
-            "name": "Certification name",
-            "issuer": "Issuing organization",
-            "year": "Year obtained"
-          }
-        ],
-        "experience": [
-          {
-            "title": "Job title",
-            "company": "Company name",
-            "duration": "Employment duration",
-            "location": "City, Country (if available)",
-            "responsibilities": ["Key responsibilities and achievements"]
-          }
-        ],
-        "education": [
-          {
-            "degree": "Degree title",
-            "institution": "University or school",
-            "location": "City, Country",
-            "year": "Graduation year"
-          }
-        ],
-        "projects": [
-          {
-            "title": "Project title",
-            "description": "Brief description of the project",
-            "technologies": ["Tech used"],
-            "outcome": "Result or impact (if any)"
-          }
-        ],
-        "links": {
-          "linkedin": "LinkedIn profile URL (if available)",
-          "portfolio": "Portfolio or personal site (if any)",
-          "github": "GitHub profile (if applicable)"
-        }
-      }
-      Use a professional tone. Prioritize relevance, match job keywords, use strong action verbs, and quantify achievements where possible.
-      Respond ONLY with a valid JSON object.
-      `;
+You are a professional resume writer. The best there is.
+Given this candidate profile:
+${JSON.stringify(
+  {
+    name: profile.full_name,
+    headline: profile.headline,
+    email: profile.email,
+    phone: profile.phone,
+    city: profile.city,
+    country: profile.country,
+    summary: profile.summary,
+    linkedin: profile.linkedin_url,
+    website: profile.website_url,
+    github: profile.github_url,
+    skills,
+    languages,
+    certifications,
+    experience: experiences,
+    education,
+    projects,
+  },
+  null,
+  2
+)}
+
+And this job description:
+${JSON.stringify(jobDescription, null, 2)}
+
+Generate a tailored resume JSON that strictly follows the ResumeData schema.
+Return only a valid JSON object with these exact keys and shapes:
+
+{
+  "name": "from the user profile",
+  "headline": "from the user profile and Job description",
+  "email": "from the user profile",
+  "phone": "from the user profile",
+  "location": "from the user profile",
+  "summary": "<string – 2–3 lines, keyword-tailored>",
+  "skills": [
+  from the user profile only if available
+    {
+      "skill": "<string – exactly as it appears in profile>",
+      "category": "Soft Skill" | "Hard Skill" | "Technical Skill",
+      "level": "from the user profile or N/A if not available"
+    }
+  ],
+  "languages": [
+  from the user profile if available
+    {
+      "language": "from the user profile",
+      "level": "from the user profile"
+    }
+  ],
+  "certifications": [
+  from the user profile if available
+    {
+      "name": "<string>",
+      "issuer": "<string>",
+      "issue_date": "<YYYY-MM-DD>",
+      "expiry_date": "<YYYY-MM-DD>",
+      "credential_id": "<string>",
+      "credential_url": "<url>",
+      "year": "<string>"
+    }
+  ],
+  "experience": [
+  from the user profile if available
+    {
+      "title": "<string>",
+      "company": "<string>",
+      "duration": "<string>",
+      "location": "<string>",
+      "responsibilities": ["<string>"]
+    }
+  ],
+  "education": [
+  from the user profile if available
+    {
+      "field": "<string>",
+      "degree": "<string>",
+      "description": "<string>",
+      "institution": "<string>",
+      "location": "<string>",
+      "duration": "<string>",
+      "gpa": <number | null>
+    }
+  ],
+  "projects": [
+  from the user profile if available
+    {
+      "name": "<string>",
+      "description": "<string>",
+      "technologies": ["<string>"],
+      "link": "<url>"
+    }
+  ],
+  "links": {
+    "linkedin": "from the user profile",
+    "website": "from the user profile as website url",
+    "github": "from the user profile"
+  }
+}
+
+Rules:
+- Do not add or invent any information that does not already exist in the profile.
+- Re-order and re-phrase bullet points and descriptions so they mirror the job description’s keywords.
+- Quantify achievements wherever numbers are available in the profile.
+- Use concise, strong action verbs.
+- Return ONLY valid JSON.
+`;
 
     console.log("Sending prompt to Gemini API for resume tailoring...");
 
@@ -166,9 +261,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract the generated text
-    const generatedText = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const generatedText =
+      response.data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    console.log("Raw Gemini API response text:", generatedText ? generatedText.slice(0, 300) + "..." : "No text");
+    console.log(
+      "Raw Gemini API response text:",
+      generatedText ? generatedText.slice(0, 300) + "..." : "No text"
+    );
 
     if (!generatedText) {
       console.error("No text content in Gemini API response:", response.data);
@@ -195,17 +294,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "Failed to parse AI response as JSON",
-          details: jsonError instanceof Error ? jsonError.message : "Unknown JSON parsing error",
+          details:
+            jsonError instanceof Error
+              ? jsonError.message
+              : "Unknown JSON parsing error",
           rawResponse: cleanedText,
         },
         { status: 500 }
       );
     }
 
-    // Calculate ATS score
-    const atsScore = Math.round(
-      (resumeJson.skills?.length / jobDescription.required_skills.length) * 100
-    );
+    // // Calculate ATS score
+    // const atsScore = Math.round(
+    //   (resumeJson.skills?.length / jobDescription.required_skills.length) * 100
+    // );
 
     // Save to database
     const { data: tailoredResume, error: saveError } = await supabase
@@ -213,7 +315,7 @@ export async function POST(request: NextRequest) {
       .insert({
         profile_id: user.id,
         resume_jsonb: resumeJson,
-        ats_score: atsScore,
+        // ats_score: atsScore,
       })
       .select()
       .single();
@@ -230,12 +332,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       resume: resumeJson,
-      atsScore,
+      // atsScore,
       id: tailoredResume.id,
       modelVersion: response.data.modelVersion,
       usageMetadata: response.data.usageMetadata,
     });
-
   } catch (error) {
     console.error("Resume tailoring error:", error);
 
@@ -249,7 +350,8 @@ export async function POST(request: NextRequest) {
       ) {
         return NextResponse.json(
           {
-            error: "Invalid API key. Please check your GEMINI_API_KEY environment variable.",
+            error:
+              "Invalid API key. Please check your GEMINI_API_KEY environment variable.",
           },
           { status: 401 }
         );

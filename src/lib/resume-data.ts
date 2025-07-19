@@ -1,12 +1,12 @@
 import { z } from "zod";
 import {
-  profileSchema,
+  rprofileSchema,
   experienceSchema,
   educationSchema,
   certSchema,
   langSchema,
   skillSchema,
-} from "./profile-schemas"; // Assuming this path is correct
+} from "./schemas"; // Assuming this path is correct
 
 // Extend existing schemas if necessary for PDF rendering (e.g., adding an 'id' for lists)
 const experiencePdfSchema = experienceSchema.extend({
@@ -31,7 +31,7 @@ const skillPdfSchema = skillSchema.extend({
 
 // Define the complete ResumeData structure
 export const resumeDataSchema = z.object({
-  profile: profileSchema,
+  profile: rprofileSchema,
   experiences: z.array(experiencePdfSchema),
   education: z.array(educationPdfSchema),
   certifications: z.array(certPdfSchema).optional(),

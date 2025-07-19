@@ -24,7 +24,7 @@ export default function RootLayout({
         className={`${poppins.className} antialiased `}
       >
         {children}
-        <Toaster position="top-center" reverseOrder={false} />
+        <Toaster containerStyle={{ bottom: 50 }} position="bottom-center" reverseOrder={false} />
       </body>
     </html>
   );

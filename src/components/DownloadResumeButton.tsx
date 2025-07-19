@@ -1,56 +1,81 @@
 "use client";
 
 import React, { useState } from 'react';
-import toast from 'react-hot-toast'; 
+import toast from 'react-hot-toast';
 import { Download, Loader2 } from 'lucide-react';
+import { Font, pdf } from '@react-pdf/renderer';
+import ResumePDF from '@/lib/pdf-template';
+import { ResumeData } from '@/lib/schemas';
+
+// Register the 'Poppins' font family with different weights and styles.
+// This is necessary for @react-pdf/renderer to use custom fonts on the client side.
+// The font files are fetched from Google Fonts.
+Font.register({
+  family: 'Poppins',
+  fonts: [
+    { src: '/fonts/Poppins-Regular.ttf', fontWeight: 400 },
+    { src: '/fonts/Poppins-Medium.ttf',  fontWeight: 500 },
+    { src: '/fonts/Poppins-SemiBold.ttf',fontWeight: 600 },
+    { src: '/fonts/Poppins-Bold.ttf',   fontWeight: 700 },
+  ],
+});
 
 interface DownloadResumeButtonProps {
-    resumeId: string;
-    fileName?: string; 
+    resumeData: ResumeData;
+    fileName?: string;
 }
 
 const DownloadResumeButton: React.FC<DownloadResumeButtonProps> = ({
-    resumeId,
+    resumeData,
     fileName = 'Tailored-resume.pdf',
 }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleDownload = async () => {
-        setIsLoading(true);
-        try {
-            
-            const apiUrl = `/api/v1/download-pdf?id=${resumeId}`;
-            const response = await fetch(apiUrl);
+        if (!resumeData) {
+            toast.error('Resume data is not available');
+            return;
+        }
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-                throw new Error(errorData.message || `Failed to fetch PDF: ${response.statusText}`);
+        setIsLoading(true);
+
+        try {
+            console.log('Generating PDF...');
+
+            // Generate PDF directly on client side
+            const documentInstance = <ResumePDF data={resumeData} />;
+            const blob = await pdf(documentInstance).toBlob();
+
+            if (blob.size === 0) {
+                throw new Error('Generated PDF is empty');
             }
 
-            // Get the PDF blob from the response
-            const blob = await response.blob();
+            console.log('PDF generated successfully, size:', blob.size, 'bytes');
 
-            // Create a URL for the blob
+            // Create download URL and trigger download
             const url = window.URL.createObjectURL(blob);
-
-            // Create a temporary link element
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', fileName); // Set the download file name
-            document.body.appendChild(link);
-            // Programmatically click the link to trigger download
-            link.click();
+            link.setAttribute('download', fileName);
 
-            // Clean up: remove the link and revoke the object URL
+            // Add to DOM, click, and cleanup
+            document.body.appendChild(link);
+            link.click();
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
 
             toast.success('Resume downloaded successfully!');
+            console.log('Download completed successfully');
 
         } catch (err: unknown) {
             console.error('Download error:', err);
-            const message = err instanceof Error ? err.message : null;
-            toast.error(message || 'Failed to download resume.');
+
+            let errorMessage = 'Failed to generate and download resume';
+            if (err instanceof Error) {
+                errorMessage = err.message;
+            }
+
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -59,18 +84,19 @@ const DownloadResumeButton: React.FC<DownloadResumeButtonProps> = ({
     return (
         <button
             onClick={handleDownload}
-            disabled={isLoading}
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none h-10 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+            disabled={isLoading || !resumeData}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            type="button"
         >
             {isLoading ? (
                 <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Downloading...
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Generating PDF...
                 </>
             ) : (
                 <>
                     Download Resume
-                    <Download className="ml-2 h-4 w-4" />
+                    <Download className="w-4 h-4" />
                 </>
             )}
         </button>

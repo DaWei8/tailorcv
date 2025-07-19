@@ -77,15 +77,15 @@ export default async function DashboardPage() {
                 />
             </div>
             {/* Disclaimer */}
-            <div className="bg-amber-50 border-l-4 max-w-7xl mx-4 lg:mx-0 border-amber-400 lg:p-5 p-3 rounded-r-lg ">
-                <div className="flex items-start gap-3">
+            <div className="bg-amber-50 text-md border-l-4 max-w-7xl mx-4 lg:mx-0 border-amber-400 lg:p-5 p-3 rounded-r-lg ">
+                <div className="flex items-start  gap-3">
                     <div>
-                        <h3 className="font-bold text-xl flex text-amber-700 mb-2">      <AlertCircle className="w-5 h-5 text-amber-700 mt-0.5 flex-shrink-0 mr-2" />Important Notice</h3>
-                        <p className="text-amber-700 leading-relaxed">
+                        <h3 className="font-bold flex text-amber-700 mb-2">      <AlertCircle className="w-5 h-5 text-amber-700 mt-0.5 flex-shrink-0 mr-2" />Important Notice</h3>
+                        <p className="text-amber-700 text-md leading-relaxed">
                             <strong>Integrity First:</strong> Falsifying work experience or skills is fraudulent and can lead to serious consequences.
                             This tool is designed to help you optimize your <em>genuine</em> qualifications. Take time to actually develop the skills you lack.
                         </p>
-                        <p className="text-amber-700 mt-2">
+                        <p className="text-amber-700 text-md  mt-2">
                             <strong>Need help planning your learning journey?</strong> Try{" "}
                             <a
                                 href="https://phasely.vercel.app/"

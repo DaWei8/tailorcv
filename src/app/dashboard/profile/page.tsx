@@ -11,8 +11,8 @@ import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 
 /* ---------- Schemas & Types ---------- */
-import { profileSchema, experienceSchema, educationSchema, certSchema, langSchema, skillSchema } from "@/lib/profile-schemas";
-import type { ProfileForm, ExperienceForm, EducationForm, CertForm, LangForm, SkillForm } from "@/lib/profile-schemas";
+import { profileSchema, experienceSchema, educationSchema, certSchema, langSchema, skillSchema } from "@/lib/schemas";
+import type { ProfileForm, ExperienceForm, EducationForm, CertForm, LangForm, SkillForm } from "@/lib/schemas";
 import Link from "next/link";
 
 // Ensure schemas align with form types

@@ -8,56 +8,64 @@ import {
   Link,
   StyleSheet,
 } from '@react-pdf/renderer';
-import { ResumeData } from './resume-data';
+import { ResumeData } from './schemas';
 
 
 
 // Define styles for the PDF document
 const styles = StyleSheet.create({
   page: {
+    display: 'flex',
     flexDirection: 'column',
+    gap: 8,
     padding: 30,
-    fontFamily: 'Inter',
-    fontSize: 10,
+    fontFamily: 'Poppins',
+    fontSize: 11,
     color: '#333',
   },
   section: {
-    marginBottom: 15,
+    display: 'flex',
+    flexDirection: 'column',
+    marginBottom: 10,
   },
   header: {
     marginBottom: 20,
     textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   name: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5,
     color: '#222',
   },
   headline: {
-    fontSize: 14,
+    fontSize: 9,
     color: '#555',
-    marginBottom: 10,
   },
   contactInfo: {
     flexDirection: 'row',
+    fontSize: 9,
     justifyContent: 'center',
     flexWrap: 'wrap',
     marginBottom: 10,
   },
   contactText: {
+    fontSize: 9,
     marginHorizontal: 5,
     color: '#666',
   },
   link: {
+    fontSize: 9,
     color: '#007bff',
     textDecoration: 'none',
     marginHorizontal: 5,
   },
   heading: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 12,
     paddingBottom: 2,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
@@ -75,38 +83,42 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   description: {
-    fontSize: 9,
-    marginBottom: 5,
-    lineHeight: 1.4,
+    fontSize: 10,
+    marginBottom: 2,
+    lineHeight: 1.6,
   },
   listItem: {
-    fontSize: 9,
-    marginLeft: 10,
-    marginBottom: 2,
+    fontSize: 10,
+    lineHeight: 1.6,
+    color: '#666',
+    marginTop: 2,
   },
   // Styles for Skills and Languages (simple list)
   tagContainer: {
+    display: "flex",
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 6,
     marginTop: 5,
   },
   tag: {
-    backgroundColor: '#e0e0e0',
-    borderRadius: 3,
-    paddingVertical: 2,
-    paddingHorizontal: 6,
-    marginRight: 5,
-    marginBottom: 5,
-    fontSize: 8,
+    backgroundColor: '#dce4eb',
+    borderRadius: 4,
+    paddingRight: 6,
+    paddingLeft: 6,
+    paddingTop: 2,
+    paddingBottom: 2,
+    textAlign: 'center',
+    fontSize: 9,
   },
 });
 
 // Helper to format date ranges
-const formatDateRange = (start?: string, end?: string) => {
-  const startDate = start ? new Date(start).getFullYear() : '';
-  const endDate = end ? new Date(end).getFullYear() : 'Present';
-  return startDate && endDate ? `${startDate} - ${endDate}` : '';
-};
+// const formatDateRange = (start?: string, end?: string) => {
+//   const startDate = start ? new Date(start).getFullYear() : '';
+//   const endDate = end ? new Date(end).getFullYear() : 'Present';
+//   return startDate && endDate ? `${startDate} - ${endDate}` : '';
+// };
 
 // Main Resume PDF Component
 interface ResumePDFProps {
@@ -116,107 +128,112 @@ interface ResumePDFProps {
 const ResumePDF: React.FC<ResumePDFProps> = ({ data }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      {/* Header Section (Profile) */}
       <View style={styles.header}>
-        <Text style={styles.name}>{data.profile.full_name}</Text>
-        <Text style={styles.headline}>{data.profile.headline}</Text>
-        <View style={styles.contactInfo}>
-          {data.profile.city && data.profile.country && (
-            <Text style={styles.contactText}>{data.profile.city}, {data.profile.country}</Text>
+        <Text style={styles.name}>{data.name}</Text>
+        <Text style={styles.headline}>{data.headline}</Text>
+        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 6 }}>
+          {data.location && (
+            <Text style={styles.contactText}>{data.location}</Text>
           )}
-          {data.profile.phone && (
-            <Text style={styles.contactText}>{data.profile.phone}</Text>
+          {data.phone && (
+            <Text style={styles.contactText}>{data.phone}</Text>
           )}
-          {data.profile.linkedin_url && (
-            <Link src={data.profile.linkedin_url} style={styles.link}>
+          {data.links.linkedin && (
+            <Link src={data.links.linkedin} style={styles.link}>
               LinkedIn
             </Link>
           )}
-          {data.profile.website_url && (
-            <Link src={data.profile.website_url} style={styles.link}>
+          {data.links.portfolio && (
+            <Link src={data.links.portfolio} style={styles.link}>
               Website
             </Link>
           )}
         </View>
       </View>
 
-      {/* Summary */}
-      {data.profile.summary && (
+      {data.summary && (
         <View style={styles.section}>
           <Text style={styles.heading}>Summary</Text>
-          <Text style={styles.description}>{data.profile.summary}</Text>
+          <Text style={styles.description}>{data.summary}</Text>
         </View>
       )}
 
-      {/* Experience */}
-      {data.experiences && data.experiences.length > 0 && (
+      {/* Experience  */}
+
+      {data.experience && data.experience.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.heading}>Experience</Text>
-          {data.experiences.map((exp, index) => (
+          {data.experience.map((exp, index) => (
             <View key={index} style={{ marginBottom: 10 }}>
-              <Text style={styles.subHeading}>{exp.job_title} at {exp.company}</Text>
-              {exp.location && <Text style={styles.dateRange}>{exp.location}</Text>}
-              <Text style={styles.dateRange}>{formatDateRange(exp.start_date, exp.end_date)}</Text>
-              {exp.description && <Text style={styles.description}>{exp.description}</Text>}
-              {exp.achievements && exp.achievements.length > 0 && (
-                <View>
-                  {exp.achievements.map((achievement, i) => (
-                    <Text key={i} style={styles.listItem}>• {achievement}</Text>
-                  ))}
+              <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }} >
+                <Text style={styles.subHeading}>{exp.title}</Text>
+                <View style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-end' }} >
+                  <Text style={styles.subHeading}>{exp.company} - {exp.location}</Text>
+                  {exp.location && <Text style={styles.dateRange}>{exp.duration}</Text>}
                 </View>
-              )}
-              {exp.skills && exp.skills.length > 0 && (
-                <View style={styles.tagContainer}>
-                  {exp.skills.map((skill, i) => (
-                    <Text key={i} style={styles.tag}>{skill}</Text>
-                  ))}
-                </View>
-              )}
+              </View>
+              <View style={{ display: "flex", flexDirection: "column" }} >
+                {exp.responsibilities && exp.responsibilities.length > 0 && <View style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                }} >{exp.responsibilities.map((responsibility, i) => {
+                  return <Text key={i} style={styles.listItem}>• {responsibility}</Text>;
+                })}</View>}
+              </View>
             </View>
           ))}
         </View>
       )}
 
-      {/* Education */}
+      {/* Education  */}
       {data.education && data.education.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.heading}>Education</Text>
           {data.education.map((edu, index) => (
-            <View key={index} style={{ marginBottom: 10 }}>
-              <Text style={styles.subHeading}>{edu.degree} in {edu.field}</Text>
-              <Text style={styles.description}>{edu.school}</Text>
-              <Text style={styles.dateRange}>{formatDateRange(edu.start_date, edu.end_date)}</Text>
-              {edu.gpa && <Text style={styles.description}>GPA: {edu.gpa.toFixed(2)}</Text>}
+            <View key={index} style={{ marginBottom: 10, display: 'flex', flexDirection: 'column' }}>
+              <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }} >
+                <View style={{ display: 'flex', flexDirection: 'column', }}>
+                  <Text style={styles.subHeading}>{edu.degree} in {edu.field} </Text>
+                  {edu.gpa && <Text style={styles.description}>GPA: {edu.gpa.toFixed(2)}</Text>}
+                </View>
+                <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                  <Text style={styles.description}>{edu.institution}</Text>
+                  <Text style={styles.dateRange}>{edu.duration}</Text>
+                </View>
+              </View>
               {edu.description && <Text style={styles.description}>{edu.description}</Text>}
             </View>
           ))}
         </View>
       )}
-
-      {/* Skills */}
+      {/* Skills  */}
       {data.skills && data.skills.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.heading}>Skills</Text>
           <View style={styles.tagContainer}>
             {data.skills.map((skill, index) => (
-              <Text key={index} style={styles.tag}>{skill.skill} ({skill.level})</Text>
+              <View key={index} style={styles.tag}>
+                <Text style={{ color: 'black' }} >{skill.skill}</Text>
+              </View>
             ))}
           </View>
         </View>
       )}
 
-      {/* Certifications */}
+      {/* Certifications  */}
       {data.certifications && data.certifications.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.heading}>Certifications</Text>
           {data.certifications.map((cert, index) => (
-            <View key={index} style={{ marginBottom: 10 }}>
+            <View key={index} style={{ marginBottom: 10, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <Text style={styles.subHeading}>{cert.name}</Text>
-              <Text style={styles.description}>Issuer: {cert.issuer}</Text>
-              <Text style={styles.dateRange}>
-                Issued: {cert.issue_date ? new Date(cert.issue_date).getFullYear() : 'N/A'}
-                {cert.expiry_date && ` | Expires: ${new Date(cert.expiry_date).getFullYear()}`}
-              </Text>
+              <View style={{ display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "flex-end" }} >
+                <Text style={styles.description}>Issued by: {cert.issuer}</Text>
+                <Text style={styles.dateRange}>
+                  Issued: {cert.issue_date ? new Date(cert.issue_date).getFullYear() : 'N/A'}
+                  {cert.expiry_date && ` | Expires: ${new Date(cert.expiry_date).getFullYear()}`}
+                </Text>
+              </View>
               {cert.credential_url && (
                 <Link src={cert.credential_url} style={styles.link}>View Credential</Link>
               )}
@@ -225,7 +242,6 @@ const ResumePDF: React.FC<ResumePDFProps> = ({ data }) => (
         </View>
       )}
 
-      {/* Languages */}
       {data.languages && data.languages.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.heading}>Languages</Text>
