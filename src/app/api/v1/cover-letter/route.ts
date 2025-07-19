@@ -1,94 +1,159 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import OpenAI from "openai";
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase-server";
+import axios from "axios";
 
-const openai = new OpenAI({ apiKey: process.env.KIMI_API_KEY! });
+// Define a more specific error type for API calls to avoid using `any`.
+interface APIError extends Error {
+  response?: {
+    data?: unknown;
+  };
+}
 
-export async function POST(req: Request) {
-  const supabase = createRouteHandlerClient({ cookies });
+export async function POST(req: NextRequest) {
+  const supabase = await createClient(); // ✅ await this
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return new Response("Unauthorized", { status: 401 });
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const {
     jobDescription,
-    resumeId = null,
+    resumeData = null, // Get resume data directly from client
     tone = "professional",
   } = await req.json();
 
-  // Fetch resume if resumeId is provided
-  let profileSource;
-  if (resumeId) {
-    const { data: resumeData, error } = await supabase
-      .from("tailored_resumes")
-      .select("resume_jsonb")
-      .eq("id", resumeId)
-      .single();
-
-    if (error || !resumeData) {
-      return new Response("Resume not found", { status: 404 });
-    }
-
-    profileSource = resumeData.resume_jsonb;
-  } else {
-    // Fall back to general profile + experiences
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .single();
-    const { data: experiences } = await supabase
-      .from("experiences")
-      .select("*");
-
-    profileSource = { ...profile, experiences };
+  if (!jobDescription?.trim()) {
+    return NextResponse.json(
+      { error: "Job description is required" },
+      { status: 400 }
+    );
   }
 
-  // Prompt: Expert-level instruction for crafting a high-quality cover letter
-  const prompt = `
-You are a world-class communications expert and career strategist with a proven record of writing high-impact, ATS-optimized cover letters for professionals across industries.
+  if (!resumeData) {
+    return NextResponse.json(
+      { error: "Resume data is required" },
+      { status: 400 }
+    );
+  }
 
-Craft a compelling, personalized cover letter tailored to the following job description:
+  // Use the resume data directly from the client
+  const profileSource = resumeData.resume || resumeData; // Handle both nested and direct formats
+  const resumeId = resumeData.id || null; // Extract resume ID if available
+
+  // Validate that we have profile data
+  if (!profileSource) {
+    return NextResponse.json(
+      { error: "No profile data found in resume" },
+      { status: 404 }
+    );
+  }
+
+  const prompt = `
+You are a world-class communications expert and career strategist with a proven record of writing high-impact, ATS-optimized cover letters.
+
+Craft a compelling, personalized cover letter tailored to the job description below:
 ${JSON.stringify(jobDescription)}
 
-Use the following candidate profile or resume data:
+Based on this candidate's resume/profile data:
 ${JSON.stringify(profileSource)}
 
+Tone: ${tone}
+
 Guidelines:
-- The tone should be ${tone} and confident.
-- Start with a captivating opening that immediately connects the candidate to the role or company’s mission.
-- Highlight the most relevant achievements and experiences that align with the role, using numbers or impact when possible.
-- Showcase personality, values, or unique value propositions without sounding generic.
-- End with a clear and engaging call to action.
+- Start with a strong, personalized opening.
+- Highlight the most relevant achievements with quantifiable results.
+- Reflect personality and alignment with the role.
+- End with a clear, confident call to action.
+- Keep it concise (3-4 paragraphs).
+- Make it sound natural and avoid overly generic language.
 
-Return only the final cover letter text (no markdown, no formatting, no preambles). Assume it's being sent directly to a hiring manager.
-
-Make it feel like it was written by a top-tier communicator who understands both career strategy and business needs.
+Return only the plain text of the final cover letter, no extra formatting or markdown.
 `;
 
-  const completion = await openai.chat.completions.create({
-    model: "moonshot-v1-8k",
-    messages: [{ role: "user", content: prompt }],
-  });
+  try {
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt.replace(/\s+/g, " ").trim(),
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.1, // Lower temperature for more consistent results
+          topP: 0.95,
+          topK: 40,
+        },
+      }
+    );
 
-  const coverLetter = completion.choices[0].message.content?.trim();
+    const coverLetter =
+      response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
-  if (!coverLetter) {
-    return new Response("Failed to generate cover letter", { status: 500 });
+    if (!coverLetter) {
+      console.error("Gemini returned no content:", response.data);
+      return NextResponse.json(
+        { error: "Gemini returned no content" },
+        { status: 500 }
+      );
+    }
+
+    // Save the cover letter to database
+    const { data: saved, error: saveError } = await supabase
+      .from("cover_letters")
+      .insert({
+        profile_id: user.id,
+        resume_id: resumeId, // Use the resume ID from the data
+        job_description: jobDescription,
+        cover_letter_text: coverLetter,
+      })
+      .select()
+      .single();
+
+    if (saveError) {
+      console.error("Error saving cover letter:", saveError);
+      // Still return the cover letter even if saving fails
+      return NextResponse.json({ 
+        coverLetter,
+        warning: "Cover letter generated but not saved to database"
+      });
+    }
+
+    return NextResponse.json({ 
+      id: saved?.id, 
+      coverLetter,
+      success: true 
+    });
+  } catch (error: unknown) {
+    const err = error as APIError;
+    console.error("Gemini API error:", err.response?.data || err.message);
+    
+    // Handle specific Gemini API errors
+    if (err.message?.includes('API_KEY')) {
+      return NextResponse.json(
+        { error: "API key configuration error" },
+        { status: 500 }
+      );
+    }
+    
+    if (err.message?.includes('QUOTA_EXCEEDED')) {
+      return NextResponse.json(
+        { error: "API quota exceeded. Please try again later." },
+        { status: 429 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Failed to generate cover letter" },
+      { status: 500 }
+    );
   }
-
-  // Save generated letter
-  const { data: saved } = await supabase
-    .from("generated_cover_letters")
-    .insert({
-      profile_id: user.id,
-      resume_id: resumeId,
-      job_description: jobDescription,
-      cover_letter_text: coverLetter,
-    })
-    .select()
-    .single();
-
-  return Response.json({ id: saved.id, coverLetter });
 }
-

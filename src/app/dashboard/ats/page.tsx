@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+
 interface ATSResult {
   score: number;
   strengths: string[];
@@ -34,10 +35,12 @@ interface ToastState {
 }
 
 function runATS(resumeText: string, jdText: string): ATSResult {
+
+
   const extractKeywords = (text: string): string[] => {
     const commonWords = new Set([
-  'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by','from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being','have', 'has', 'had', 'do', 'does', 'did','will', 'would', 'could', 'should', 'may', 'might', 'must', 'can','a', 'an', 'we', 'you', 'they', 'it', 'he', 'she', 'him', 'her', 'his', 'their', 'our', 'my', 'your','this', 'that', 'these', 'those','i', 'me', 'us', 'them', 'theirs', 'ours','one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten','just', 'very','really', 'some', 'any', 'such', 'much', 'more', 'most', 'many','also', 'however', 'though', 'even', 'yet', 'still', 'while', 'although', 'because', 'so', 'than','then', 'if', 'when', 'where', 'which', 'who', 'whom', 'whose', 'what', 'how'
-]);
+      'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'a', 'an', 'we', 'you', 'they', 'it', 'he', 'she', 'him', 'her', 'his', 'their', 'our', 'my', 'your', 'this', 'that', 'these', 'those', 'i', 'me', 'us', 'them', 'theirs', 'ours', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'just', 'very', 'really', 'some', 'any', 'such', 'much', 'more', 'most', 'many', 'also', 'however', 'though', 'even', 'yet', 'still', 'while', 'although', 'because', 'so', 'than', 'then', 'if', 'when', 'where', 'which', 'who', 'whom', 'whose', 'what', 'how'
+    ]);
 
     return (text.toLowerCase()
       .match(/\b[a-z]+(?:[+#]|\b)/g) || [])
@@ -163,6 +166,7 @@ truthfully represents your experience and qualifications.
 }
 
 export default function ATSScanner() {
+
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -170,6 +174,45 @@ export default function ATSScanner() {
   const [showModal, setShowModal] = useState(false);
   const [toasts, setToasts] = useState<ToastState[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // const [file, setFile] = useState(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('idle'); // idle, uploading, success, error
+  // const fileInputRef = useRef(null);
+
+  // Drag and drop handlers
+  const handleDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Only set dragOver to false if we're leaving the drop zone entirely
+    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+      setIsDragOver(false);
+    }
+  };
+
+  // Remove file
+  const removeFile = () => {
+    setFile(null);
+    setUploadStatus('idle');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Format file size
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
 
   const addToast = (message: string, type: "success" | "error" | "warning") => {
     const id = Date.now();
@@ -183,9 +226,8 @@ export default function ATSScanner() {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    const uploadedFile = e.target.files?.[0];
-    if (!uploadedFile) return;
+  const handleFile = (fileToProcess: File | null | undefined) => {
+    if (!fileToProcess) return;
 
     const validTypes = [
       "application/pdf",
@@ -193,18 +235,30 @@ export default function ATSScanner() {
       "text/plain"
     ];
 
-    if (!validTypes.includes(uploadedFile.type)) {
+    if (!validTypes.includes(fileToProcess.type)) {
       addToast("Please upload a PDF, Word document, or text file", "error");
       return;
     }
 
-    if (uploadedFile.size > 10 * 1024 * 1024) {
+    if (fileToProcess.size > 10 * 1024 * 1024) {
       addToast("File size must be less than 10MB", "error");
       return;
     }
 
-    setFile(uploadedFile);
+    setFile(fileToProcess);
+    setUploadStatus('success');
     addToast("Resume uploaded successfully!", "success");
+  };
+
+  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    handleFile(e.target.files?.[0]);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragOver(false);
+    handleFile(event.dataTransfer.files?.[0]);
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -307,40 +361,122 @@ export default function ATSScanner() {
           </p>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* File Upload */}
-            <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2">
-                Upload Your Resume
-              </label>
-              <div className="relative">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf,.docx,.txt"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="resume-upload"
-                />
-                <label
-                  htmlFor="resume-upload"
-                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
-                >
-                  <div className="flex flex-col items-center space-y-2">
-                    <UploadCloud className="w-8 h-8 text-gray-400" />
-                    <p className="text-sm text-gray-600">
-                      {file ? file.name : "Click to upload your resume"}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      PDF, Word, or Text files (max 10MB)
-                    </p>
-                  </div>
+            <div className="max-w-2xl mx-auto bg-white">
+              <div className="mb-6">
+                <label className="block text-base font-semibold text-gray-700 mb-2">
+                  Upload Your Resume
                 </label>
-              </div>
-              {file && (
-                <div className="mt-2 flex items-center gap-2 text-sm text-green-600">
-                  <FileText size={16} />
-                  <span>{file.name} ({(file.size / 1024).toFixed(1)} KB)</span>
+
+                <div className="relative">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.docx,.txt"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="resume-upload"
+                  />
+
+                  <label
+                    htmlFor="resume-upload"
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`
+              flex flex-col items-center justify-center w-full h-32 
+              border-2 border-dashed rounded-lg cursor-pointer 
+              transition-all duration-200 ease-in-out
+              ${isDragOver
+                        ? 'border-blue-500 bg-blue-50 scale-105'
+                        : file
+                          ? 'border-green-400 bg-green-50'
+                          : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                      }
+            `}
+                  >
+                    <div className="flex flex-col items-center space-y-2">
+                      <UploadCloud
+                        className={`w-8 h-8 transition-colors ${isDragOver ? 'text-blue-500' :
+                          file ? 'text-green-500' : 'text-gray-400'
+                          }`}
+                      />
+                      <p className="text-sm font-medium text-gray-600">
+                        {isDragOver
+                          ? "Drop your file here"
+                          : file
+                            ? "File ready! Click to change"
+                            : "Drag & drop your resume here"
+                        }
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {!isDragOver && "or click to browse"}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        PDF, Word, or Text files (max 10MB)
+                      </p>
+                    </div>
+                  </label>
                 </div>
-              )}
+
+                {/* File Preview */}
+                {file && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white rounded-lg border">
+                          <FileText className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 truncate max-w-xs">
+                            {file.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {formatFileSize(file.size)} • {file.type || 'Unknown type'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={removeFile}
+                        className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                        title="Remove file"
+                      >
+                        <X className="w-5 h-5 text-gray-500" />
+                      </button>
+                    </div>
+
+                    {uploadStatus === 'success' && (
+                      <div className="mt-3 text-sm text-green-600 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Ready to submit
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Upload Button */}
+                {file && (
+                  <div className="mt-4">
+                    <button
+                      className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium 
+                       hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                      Process Resume
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Usage Instructions */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+                <h3 className="font-semibold text-blue-900 mb-2">How to use:</h3>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Drag and drop your resume file onto the upload area</li>
+                  <li>• Or click the upload area to browse and select a file</li>
+                  <li>• Supported formats: PDF, Word (.docx), and Text (.txt)</li>
+                  <li>• Maximum file size: 10MB</li>
+                </ul>
+              </div>
             </div>
 
             {/* Job Description */}

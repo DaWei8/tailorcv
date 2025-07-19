@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import Logo from "../../public/tailorcv_logo.svg"
+import Logo from "../../public/logo.svg"
 
 const NavLanding = () => {
     return (

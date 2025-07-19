@@ -1,19 +1,140 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowLeft, Loader2, WandSparkles, FileText, X, Check } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
+
+// Storage utilities for job description
+const JD_STORAGE_KEY = "saved_job_description";
+const COVER_LETTER_STORAGE_KEY = "generated_cover_letters";
+
+interface SavedJobDescription {
+    text: string;
+    createdAt: string;
+    lastUsed: string;
+}
+
+interface SavedCoverLetter {
+    id: string;
+    coverLetter: string;
+    jobDescription: string;
+    createdAt: string;
+}
+
+const jobDescriptionStorage = {
+    save: (jdText: string) => {
+        try {
+            const savedData: SavedJobDescription = {
+                text: jdText,
+                createdAt: new Date().toISOString(),
+                lastUsed: new Date().toISOString()
+            };
+            localStorage.setItem(JD_STORAGE_KEY, JSON.stringify(savedData));
+        } catch (error) {
+            console.error('Error saving job description:', error);
+        }
+    },
+
+    load: (): SavedJobDescription | null => {
+        try {
+            const stored = localStorage.getItem(JD_STORAGE_KEY);
+            return stored ? JSON.parse(stored) : null;
+        } catch (error) {
+            console.error('Error loading job description:', error);
+            return null;
+        }
+    },
+
+    clear: () => {
+        try {
+            localStorage.removeItem(JD_STORAGE_KEY);
+        } catch (error) {
+            console.error('Error clearing job description:', error);
+        }
+    }
+};
+
+const coverLetterStorage = {
+    save: (coverLetter: string, jobDescription: string) => {
+        try {
+            const newCoverLetter: SavedCoverLetter = {
+                id: Date.now().toString(),
+                coverLetter,
+                jobDescription,
+                createdAt: new Date().toISOString()
+            };
+
+            const existing = coverLetterStorage.loadAll();
+            const updated = [newCoverLetter, ...existing.slice(0, 4)]; // Keep only last 5
+            localStorage.setItem(COVER_LETTER_STORAGE_KEY, JSON.stringify(updated));
+        } catch (error) {
+            console.error('Error saving cover letter:', error);
+        }
+    },
+
+    loadAll: (): SavedCoverLetter[] => {
+        try {
+            const stored = localStorage.getItem(COVER_LETTER_STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Error loading cover letters:', error);
+            return [];
+        }
+    }
+};
 
 export default function CoverLetterPage() {
     const [jobDescription, setJobDescription] = useState("");
-    const [tone, setTone] = useState("confident");
     const [loading, setLoading] = useState(false);
     const [coverLetter, setCoverLetter] = useState("");
     const [error, setError] = useState("");
+    const [showJDModal, setShowJDModal] = useState(false);
+    const [savedJD, setSavedJD] = useState<SavedJobDescription | null>(null);
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    // Load saved job description on component mount
+    useEffect(() => {
+        const loadSavedJD = () => {
+            const saved = jobDescriptionStorage.load();
+            if (saved) {
+                setSavedJD(saved);
+                setShowJDModal(true);
+            }
+            setIsInitialized(true);
+        };
+
+        loadSavedJD();
+    }, []);
+
+    // Save job description whenever it changes (debounced)
+    useEffect(() => {
+        if (!isInitialized || !jobDescription.trim()) return;
+
+        const timeoutId = setTimeout(() => {
+            jobDescriptionStorage.save(jobDescription);
+        }, 2000); // Save 2 seconds after user stops typing
+
+        return () => clearTimeout(timeoutId);
+    }, [jobDescription, isInitialized]);
+
+    const handleUseSavedJD = () => {
+        if (savedJD) {
+            setJobDescription(savedJD.text);
+            // Update last used timestamp
+            jobDescriptionStorage.save(savedJD.text);
+            toast.success("Job description loaded!");
+        }
+        setShowJDModal(false);
+    };
+
+    const handleCancelSavedJD = () => {
+        setShowJDModal(false);
+    };
 
     const generateCoverLetter = async () => {
         if (!jobDescription.trim()) {
@@ -21,30 +142,142 @@ export default function CoverLetterPage() {
             return;
         }
 
+        // Get resume data directly from localStorage
+        const storedResume = localStorage.getItem("tailored_resume_data");
+        let resumeData = null;
+
+        if (storedResume) {
+            try {
+                resumeData = JSON.parse(storedResume);
+            } catch (e) {
+                console.error("Error parsing stored resume:", e);
+                setError("Error reading resume data. Please try again.");
+                return;
+            }
+        }
+
+        if (!resumeData) {
+            setError("No resume found. Please create or upload a resume first.");
+            return;
+        }
+
         setLoading(true);
         setError("");
 
         try {
-            const res = await fetch("/api/cover-letter", {
+            const res = await fetch("/api/v1/cover-letter", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ jobDescription, tone }),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    jobDescription,
+                    resumeData, // Send the full resume data
+                    tone: "professional"
+                }),
             });
 
-            if (!res.ok) throw new Error(await res.text());
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error("API Error:", errorText);
+                throw new Error(errorText || `HTTP ${res.status}: ${res.statusText}`);
+            }
 
-            const { coverLetter } = await res.json();
-            setCoverLetter(coverLetter);
-        } catch (err: string | Error | unknown) {
-            setError("Something went wrong. Please try again.");
-            console.error(err);
+            const data = await res.json();
+
+            if (!data.coverLetter) {
+                throw new Error("No cover letter received from server");
+            }
+
+            setCoverLetter(data.coverLetter);
+
+            // Save the generated cover letter and update job description storage
+            coverLetterStorage.save(data.coverLetter, jobDescription);
+            jobDescriptionStorage.save(jobDescription);
+
+            toast.success("Cover letter ready!");
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error
+                ? err.message
+                : "Something went wrong. Please try again.";
+
+            setError(errorMessage);
+            console.error("Cover letter generation error:", err);
+            toast.error("Failed to generate cover letter");
         } finally {
             setLoading(false);
         }
     };
 
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const getPreviewText = (text: string, wordLimit: number = 200) => {
+        const words = text.split(' ');
+        if (words.length <= wordLimit) return text;
+        return words.slice(0, wordLimit).join(' ') + '...';
+    };
+
     return (
         <div className="min-h-screen flex flex-col items-center bg-gray-50 text-gray-900 mx-auto space-y-6 pb-20">
+            {/* Saved Job Description Modal */}
+            {showJDModal && savedJD && (
+                <Dialog open={showJDModal} onOpenChange={setShowJDModal}>
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                                <FileText className="w-5 h-5" />
+                                Use Previous Job Description?
+                            </DialogTitle>
+                        </DialogHeader>
+
+                        <div className="space-y-4">
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <p className="text-sm text-blue-800 mb-2">
+                                    <span className="font-medium">Found saved job description</span>
+                                    <br />
+                                    Last used: {formatDate(savedJD.lastUsed)}
+                                </p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium">Preview (first 200 words):</Label>
+                                <div className="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                                        {getPreviewText(savedJD.text)}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <Button
+                                    onClick={handleUseSavedJD}
+                                    className="flex-1 flex items-center gap-2"
+                                >
+                                    <Check className="w-4 h-4" />
+                                    Use This Job Description
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={handleCancelSavedJD}
+                                    className="flex items-center gap-2"
+                                >
+                                    <X className="w-4 h-4" />
+                                    Start Fresh
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
+
             {/* Header */}
             <div className="bg-white w-full shadow">
                 <div className="max-w-7xl w-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,20 +288,42 @@ export default function CoverLetterPage() {
                             </Link>
                             Craft Cover Letter
                         </div>
+
+                        {/* Clear saved data button */}
+                        {savedJD && (
+                            <button
+                                onClick={() => {
+                                    jobDescriptionStorage.clear();
+                                    setSavedJD(null);
+                                    toast.success("Saved job description cleared");
+                                }}
+                                className="text-sm text-red-600 hover:text-red-800 transition-colors"
+                            >
+                                Clear Saved JD
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
 
             <div className="bg-white mx-auto max-w-2xl flex flex-col gap-4 rounded-xl shadow-xl lg:p-6 p-4">
+                <h2 className="text-lg w-full mb-2 text-center font-semibold">Paste Your Job Description</h2>
 
-                <p className="text-sm text-center bg-gray-100 p-3 rounded-lg mb-4 w-full text-gray-600">
-                    Upload the job description and we will craft a professional cover letter that ensures you make a lasting impression.
-                </p>
-                <div className="w-full space-y-2" >
-                    <Label htmlFor="job-description">Job Description</Label>
+                {/* Auto-save indicator */}
+                {jobDescription.trim() && isInitialized && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-2">
+                        <p className="text-xs text-green-700 text-center">
+                            ✓ Job description will be saved automatically
+                        </p>
+                    </div>
+                )}
+
+                <div className="w-full space-y-2">
+                    <Label className="text-md" htmlFor="job-description">Job Description</Label>
                     <Textarea
                         id="job-description"
-                        placeholder="Paste the job description here..."
+                        placeholder="Paste your job description, and we'll generate a polished cover letter designed to leave a lasting impression."
+                        title="job-description"
                         className="w-full max-w-4xl h-64 border border-gray-400 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
                         value={jobDescription}
                         onChange={(e) => setJobDescription(e.target.value)}
@@ -76,28 +331,24 @@ export default function CoverLetterPage() {
                     />
                 </div>
 
-                <div className="w-full space-y-2" >
-                    <Label htmlFor="tone">Tone</Label>
-                    <select
-                        id="tone"
-                        title="tone"
-                        value={tone}
-                        onChange={(e) => setTone(e.target.value)}
-                        className="w-full max-w-4xl border border-gray-400 rounded-md p-3 focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="confident">Confident</option>
-                        <option value="enthusiastic">Enthusiastic</option>
-                        <option value="formal">Formal</option>
-                        <option value="friendly">Friendly</option>
-                        <option value="persuasive">Persuasive</option>
-                    </select>
-                </div>
-
                 {error && <p className="text-sm text-red-600">{error}</p>}
 
-                <Button onClick={generateCoverLetter} disabled={loading}>
-                    {loading ? <Loader2 className="animate-spin mr-2" /> : null}
-                    {loading ? "Generating..." : "Generate Cover Letter"}
+                <Button
+                    onClick={generateCoverLetter}
+                    disabled={loading}
+                    className="flex items-center gap-2"
+                >
+                    {loading ? (
+                        <>
+                            Generating...
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        </>
+                    ) : (
+                        <>
+                            Generate Cover Letter
+                            <WandSparkles className="w-4 h-4" />
+                        </>
+                    )}
                 </Button>
             </div>
 
@@ -107,7 +358,9 @@ export default function CoverLetterPage() {
                         <Button variant="outline" className="mt-4">View Cover Letter</Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-xl">
-                        <h2 className="text-xl font-semibold mb-4">Your Cover Letter</h2>
+                        <DialogHeader>
+                            <DialogTitle>Your Cover Letter</DialogTitle>
+                        </DialogHeader>
                         <Textarea
                             readOnly
                             value={coverLetter}
@@ -116,7 +369,10 @@ export default function CoverLetterPage() {
                         <Button
                             className="mt-2 py-3 px-2"
                             size={"default"}
-                            onClick={() => navigator.clipboard.writeText(coverLetter)}
+                            onClick={() => {
+                                navigator.clipboard.writeText(coverLetter);
+                                toast.success("Copied to clipboard!");
+                            }}
                         >
                             Copy to Clipboard
                         </Button>

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase"; 
-import Logo from "../../public/tailorcv_logo.svg";
+import Logo from "../../public/logo.svg";
 import Image from "next/image";
 
 export default function Nav() {

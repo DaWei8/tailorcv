@@ -1,4 +1,4 @@
-import Logo from "../../../public/tailorcv_logo.svg"
+import Logo from "../../../public/logo.svg"
 import PricingCard from "@/components/PricingCard";
 import Image from "next/image";
 import Link from "next/link";

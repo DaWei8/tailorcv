@@ -2,8 +2,9 @@ import { UserCircle, FileText, MailCheck, ExternalLink, AlertCircle, ScanEye, Bo
 import { createClient } from "@/lib/supabase-server"
 import { redirect } from "next/navigation"
 import Link from "next/link";
-import Logo from "../../../public/tailorcv_logo.svg";
+import Logo from "../../../public/logo.svg";
 import Image from "next/image";
+import UserMenu from "@/components/UserMenu";
 
 const resumeCards = [
     {
@@ -66,6 +67,7 @@ const resumeCards = [
 
 export default async function DashboardPage() {
     const supabase = await createClient()
+
     const {
         data: { user },
     } = await supabase.auth.getUser()
@@ -88,13 +90,7 @@ export default async function DashboardPage() {
                             <p className="px-2 py-1 text-green-600 font-medium bg-green-100 w-fit text-[12px] border border-green-300 rounded-full" >Free plan</p>
                         </div>
                         {/* <LogoutButton /> */}
-                        <Image
-                            src={user.user_metadata.avatar_url}
-                            alt="user profile image"
-                            width={32}
-                            height={32}
-                            className="rounded-full md:w-[40px] md:h-[40px] object-cover"
-                        />
+                        <UserMenu user={user} />
                     </div>
                 </div>
             </div>
@@ -156,23 +152,23 @@ function DashboardCard({
 }) {
     const CardContent = (
         <div
-            className={`relative flex flex-col w-full h-full rounded-2xl shadow-xl max-w-md bg-white shadow-gray-200 py-10 items-center text-center space-y-3
+            className={`relative flex flex-col w-[100%] max-w-md h-full rounded-2xl shadow-xl bg-white shadow-gray-200 py-10 items-center text-center gap-3
         ${comingSoon ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-2xl hover:border-blue-600 hover:shadow-blue-200 hover:scale-105 transition'}
       `}
         >
             {comingSoon && (
-                <div className="absolute inset-0 bg-white/70 z-10 flex items-center justify-center rounded-2xl">
-                    <span className="text-lg font-semibold text-gray-900">Coming Soon</span>
+                <div className="absolute inset-0 bg-white/70 z-10 flex items-start p-4 justify-end rounded-2xl">
+                    <p className="px-2 py-1 text-gray-800 font-medium bg-gray-100 w-fit text-sm uppercase border border-gray-300 rounded-full" >Coming soon</p>
                 </div>
             )}
 
             <div className="p-3 bg-blue-50 w-14 max-h-14 flex items-center justify-center text-white rounded-full group-hover:scale-110 transition-transform z-0">
                 {icon}
             </div>
-            <h3 className="text-lg lg:text-xl font-bold z-0">{title}</h3>
+            <h3 className="text-lg lg:text-xl w-full font-bold z-0">{title}</h3>
             <p className="text-gray-600 text-sm lg:text-base w-[70%] lg:w-[75%] z-0">{desc}</p>
         </div>
     );
 
-    return comingSoon ? CardContent : <Link href={link}>{CardContent}</Link>;
+    return comingSoon ? CardContent : <Link className="w-full" href={link}>{CardContent}</Link>;
 }

@@ -19,11 +19,34 @@ interface ResumePreview {
   id: string;
   resume: ResumeData;
   jobDescription?: ParsedJD;
+  jobDescriptionRaw?: string; // Store the raw JD text
   createdAt: string;
 }
 
-// Storage utilities (replace with localStorage in your actual project)
+// Storage utilities
 const STORAGE_KEY = "tailored_resume_data";
+const JD_STORAGE_KEY = "saved_job_description"; // Shared with cover letter page
+
+interface SavedJobDescription {
+  text: string;
+  createdAt: string;
+  lastUsed: string;
+}
+
+const jobDescriptionStorage = {
+  save: (jdText: string) => {
+    try {
+      const savedData: SavedJobDescription = {
+        text: jdText,
+        createdAt: new Date().toISOString(),
+        lastUsed: new Date().toISOString()
+      };
+      localStorage.setItem(JD_STORAGE_KEY, JSON.stringify(savedData));
+    } catch (error) {
+      console.error('Error saving job description:', error);
+    }
+  }
+};
 
 const storageUtils = {
   save: (data: ResumePreview) => {
@@ -58,11 +81,9 @@ const storageUtils = {
       console.error('Error clearing localStorage:', error);
     }
   }
-
 };
 
 export default function TailorPage() {
-
   const [jdRaw, setJdRaw] = useState("");
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<ResumePreview | null>(null);
@@ -77,10 +98,9 @@ export default function TailorPage() {
       const savedData = storageUtils.load();
       if (savedData) {
         setPreview(savedData);
-        // Optionally restore the job description text too
-        if (savedData.jobDescription) {
-          // save the original JD text too
-          // setJdRaw(savedData.jobDescription);
+        // Restore the raw job description if available
+        if (savedData.jobDescriptionRaw) {
+          setJdRaw(savedData.jobDescriptionRaw);
         }
         toast.success("Restored your previous resume!");
       }
@@ -97,6 +117,17 @@ export default function TailorPage() {
     }
   }, [preview, isLoadingFromStorage]);
 
+  // Save job description whenever it changes (debounced)
+  useEffect(() => {
+    if (!isLoadingFromStorage && jdRaw.trim()) {
+      const timeoutId = setTimeout(() => {
+        jobDescriptionStorage.save(jdRaw);
+      }, 2000); // Save 2 seconds after user stops typing
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [jdRaw, isLoadingFromStorage]);
+
   const handle = async () => {
     if (!jdRaw.trim()) return toast.error("Paste a job description first.");
     setLoading(true);
@@ -104,6 +135,7 @@ export default function TailorPage() {
     try {
       const parsed: ParsedJD = await fetch("/api/v1/parse-job-description", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rawText: jdRaw }),
       }).then((r) => r.json());
 
@@ -112,14 +144,19 @@ export default function TailorPage() {
         body: JSON.stringify({ jobDescription: parsed }),
       }).then((r) => r.json());
 
-      // Add metadata for storage
+      // Add metadata for storage, including raw job description
       const resumeWithMetadata: ResumePreview = {
         ...tailor,
         jobDescription: parsed,
+        jobDescriptionRaw: jdRaw, // Save the original raw text
         createdAt: new Date().toISOString()
       };
 
       setPreview(resumeWithMetadata);
+      
+      // Save job description for cover letter use
+      jobDescriptionStorage.save(jdRaw);
+      
       toast.success("Resume ready!");
     } catch (error) {
       console.error('Tailoring error:', error);
@@ -211,6 +248,11 @@ export default function TailorPage() {
               <p className="text-sm text-green-800">
                 <span className="font-medium">Resume restored!</span> Last generated on {formatDate(preview.createdAt)}
               </p>
+              {preview.jobDescriptionRaw && (
+                <p className="text-xs text-green-600 mt-1">
+                  Job description also available for cover letter generation
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -218,14 +260,24 @@ export default function TailorPage() {
 
       {/* JD Input */}
       <div className="bg-white mx-4 w-full max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
-        <h2 className="text-lg w-full mb-2 text-center font-semibold">Paste Job Description</h2>
+        <h2 className="text-2xl font-bold w-full mb-2 text-center ">Paste Job Description</h2>
+        
+        {/* Auto-save indicator */}
+        {jdRaw.trim() && !isLoadingFromStorage && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-2 mb-4">
+            <p className="text-xs text-green-700 text-center">
+              ✓ Job description will be saved for cover letter generation
+            </p>
+          </div>
+        )}
+        
         <div className="w-full flex flex-col gap-4 items-center justify-center">
           <textarea
             value={jdRaw}
             onChange={(e) => setJdRaw(e.target.value)}
             rows={10}
             placeholder="Paste your job description to instantly generate a tailored resume that aligns perfectly with the role."
-            className="w-full max-w-4xl  h-full max-h-h-72 border text-sm border-gray-400 rounded-lg px-3 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full max-w-4xl h-full max-h-h-72 border text-sm border-gray-400 rounded-lg px-3 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <button
@@ -266,18 +318,25 @@ export default function TailorPage() {
                 </div>
 
                 <div className="text-sm w-full min-h-[80vh] rounded-lg">
-                  {/* <pre className="mt-2 text-xs w-full bg-gray-100 p-2 rounded-lg overflow-auto min-h-32 max-h-60">
-                    {JSON.stringify(preview.resume, null, 1)}
-                  </pre> */}
                   <div className="border rounded-lg " >
                     <ResumePDF data={preview.resume} />
                   </div>
                 </div>
 
-                <DownloadResumeButton
-                  resumeData={preview.resume}
-                  fileName={`tailored-resume-${Date.now()}.pdf`}
-                />
+                <div className="flex flex-col sm:flex-row gap-3 w-full">
+                  <DownloadResumeButton
+                    resumeData={preview.resume}
+                    fileName={`tailored-resume-${Date.now()}.pdf`}
+                  />
+                  
+                  {/* Quick link to cover letter generation */}
+                  <Link 
+                    href="/cover-letter" 
+                    className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors text-center"
+                  >
+                    Generate Cover Letter →
+                  </Link>
+                </div>
               </div>
             </div>
           )}
