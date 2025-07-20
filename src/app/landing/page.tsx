@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
 import NavLanding from "@/components/NavLanding";
+// import Logo from "../../../public/logo.svg"
+// import Image from "next/image";
+
 
 export default function LandingPage() {
   return (

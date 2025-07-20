@@ -2,7 +2,7 @@ import { UserCircle, FileText, MailCheck, ExternalLink, AlertCircle, ScanEye, Bo
 import { createClient } from "@/lib/supabase-server"
 import { redirect } from "next/navigation"
 import Link from "next/link";
-import Logo from "../../../public/logo.svg";
+import Logo from "../../../public/logo2.svg";
 import Image from "next/image";
 import UserMenu from "@/components/UserMenu";
 // import { queryUserId } from "@/lib/queryUserId";
@@ -90,7 +90,7 @@ export default async function DashboardPage() {
                             <Link href="/dashboard" className="font-bold text-xl">
                                 <Image src={Logo} className="w-24" alt="Tailor CV logo" />
                             </Link>
-                            <p className="px-2 py-1 text-green-600 font-medium bg-green-100 w-fit text-[12px] border border-green-300 rounded-full" >Free plan</p>
+                            <p className="px-2 py-1 text-green-600 font-medium bg-green-100 w-fit text-[12px] border border-green-600 rounded-full" >Free plan</p>
                         </div>
                         {/* <LogoutButton /> */}
                         <UserMenu />

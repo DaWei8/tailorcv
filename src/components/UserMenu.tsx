@@ -64,6 +64,7 @@ export default function UserMenu() {
             {/* Profile */}
             <button 
               title="clickable profile image button" 
+              className=" cursor-pointer "
               onClick={() => setShowMenu(!showMenu)}
             >
               <Image
@@ -86,7 +87,7 @@ export default function UserMenu() {
               setShowHistory(true)
               setShowMenu(false)
             }}
-            className="w-full px-4 py-2 text-left hover:bg-gray-100"
+            className="w-full px-4 py-2 text-left cursor-pointer hover:bg-gray-100"
           >
             View History
           </button>
@@ -95,7 +96,7 @@ export default function UserMenu() {
               setShowLogoutModal(true)
               setShowMenu(false)
             }}
-            className="w-full px-4 py-2 text-left hover:bg-gray-100 text-red-600"
+            className="w-full px-4 py-2 cursor-pointer text-left hover:bg-gray-100 text-red-600"
           >
             Logout
           </button>
@@ -128,7 +129,7 @@ export default function UserMenu() {
 
       {/* History Sidebar */}
       {showHistory && (
-        <div className="fixed top-0 right-0 w-80 h-full bg-white shadow-lg z-50">
+        <div className="fixed top-0 right-0 w-[30vw] h-full bg-white shadow-lg z-50">
           <div className="flex justify-between items-center px-4 py-3 border-b">
             <h3 className="font-semibold text-lg">History</h3>
             <button onClick={() => setShowHistory(false)}>✕</button>
