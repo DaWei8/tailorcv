@@ -5,21 +5,9 @@ import toast from "react-hot-toast";
 import { Loader2, WandSparkles, ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
 import DownloadResumeButton from "@/components/DownloadResumeButton";
-import ResumePDF from "@/lib/pdf-template";
 import { ResumeData, Skill } from "@/lib/schemas";
 import UserMenu from "@/components/UserMenu";
-// import { createClient } from "@/lib/supabase-server";
-// import { redirect } from "next/navigation";
-// import { queryUserId } from "@/lib/queryUserId";
-// import { User } from "@supabase/supabase-js";
-
-
-
-// const supabase = await createClient()
-
-// const {
-//   data: { user },
-// } = await supabase.auth.getUser()
+import ResumePDF from "@/components/ResumePDf";
 
 
 interface ParsedJD {
