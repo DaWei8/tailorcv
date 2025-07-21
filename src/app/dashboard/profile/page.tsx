@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { User, Plus, Edit, Trash2, Star, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -8,9 +8,18 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ParsedUserProfile, Profile } from "@/lib/schemas";
 import ResumeToProfileCard from "@/components/ResumetoProfileCard";
+// import { NextResponse } from "next/server";
 import { PageHeading } from "@/components/PageHeading";
 
 
+// const supabase = await createClient();
+// const {
+//   data: { user },
+// } = await supabase.auth.getUser();
+
+// if (!user) {
+//   NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+// }
 const MAX_PROFILES = 3;
 
 export default function ProfileManagementPage() {
@@ -36,7 +45,7 @@ export default function ProfileManagementPage() {
   }, []);
 
   // Load profiles
-  const loadProfiles = async () => {
+  const loadProfiles = useCallback(async () => {
     if (!userId) return;
 
     setLoading(true);
@@ -54,13 +63,13 @@ export default function ProfileManagementPage() {
       setProfiles(data || []);
     }
     setLoading(false);
-  };
+  }, [userId]);
 
   useEffect(() => {
     if (userId) {
       loadProfiles();
     }
-  });
+  }, [userId, loadProfiles]);
 
   // Create new profile
   const createProfile = async (full_name: string, headline: string) => {
