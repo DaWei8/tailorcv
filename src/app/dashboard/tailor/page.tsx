@@ -9,6 +9,7 @@ import { ResumeData, Skill } from "@/lib/schemas";
 import UserMenu from "@/components/UserMenu";
 import ResumePDF from "@/components/resume-templates/ResumePDf";
 import { PageHeading } from "@/components/PageHeading";
+import LogoMain from "@/components/Logo";
 
 
 interface ParsedJD {
@@ -208,17 +209,16 @@ export default function TailorPage() {
       <div className="bg-white w-full shadow">
         <div className="max-w-7xl w-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-
             <Link className="" href="/dashboard">
               <ArrowLeft />
             </Link>
-
+            <LogoMain />
             {/* Clear storage button */}
             {preview ? (
               <div className="flex items-center justify-end gap-2 float-right" >
                 <button
                   onClick={clearStoredData}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-3 py-3 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
                   title="Clear stored resume data"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -242,7 +242,7 @@ export default function TailorPage() {
 
         {/* Auto-save indicator */}
         {jdRaw.trim() && !isLoadingFromStorage && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-2 mb-4">
+          <div className="bg-green-50 border border-green-200 rounded-md p-2 mb-4">
             <p className="text-xs text-green-700 text-center">
               ✓ Job description will be saved for cover letter generation
             </p>
@@ -255,19 +255,19 @@ export default function TailorPage() {
             onChange={(e) => setJdRaw(e.target.value)}
             rows={10}
             placeholder="Paste your job description to instantly generate a tailored resume that aligns perfectly with the role."
-            className="w-full max-w-4xl h-full max-h-h-72 border text-sm border-gray-400 rounded-lg px-3 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full max-w-4xl h-full max-h-h-72 border text-sm border-gray-400 rounded-md px-3 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <button
             onClick={handle}
             disabled={loading}
-            className="btn-primary rounded-lg flex text-base py-2 w-fit justify-center px-3 items-center space-x-2"
+            className="btn-primary rounded-md flex text-base py-3 w-full justify-center px-3 items-center space-x-2"
           >
             <span>{loading ? "Tailoring…" : "Tailor Your Resume"}</span>
             {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <WandSparkles className="w-4 h-4" />}
           </button>
           {preview && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3 mx-4 w-full max-w-2xl">
+            <div className="bg-green-50 border border-green-200 rounded-md p-3 mx-4 w-full max-w-2xl">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-green-800">
@@ -295,25 +295,26 @@ export default function TailorPage() {
                 )}
               </div>
 
-              <div className=" w-full flex flex-col items-center rounded-lg space-y-4">
-                {/* Skills highlight */}
-                <div className="w-full p-2 rounded-lg bg-gray-50">
-                  <h3 className="text-sm font-semibold mb-2">Skills matched</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {(preview.resume.skills.map((s: Skill) => s.skill) as { skills?: string[] })?.skills?.map((s, i) => (
-                      <span
-                        key={i}
-                        className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+              <div className=" w-full flex flex-col items-center rounded-md space-y-4">
 
-                <div className="text-sm w-full min-h-[80vh] rounded-lg">
-                  <div className="border rounded-lg " >
+
+                <div className="text-sm w-full min-h-[80vh] rounded-md">
+                  <div className="border rounded-md " >
                     <ResumePDF data={preview.resume} />
+                  </div>
+                  {/* Skills highlight */}
+                  <div className="w-full p-2 rounded-md bg-gray-50">
+                    <h3 className="text-sm font-semibold mb-2">Skills matched</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {(preview.resume.skills.map((s: Skill) => s.skill) as { skills?: string[] })?.skills?.map((s, i) => (
+                        <span
+                          key={i}
+                          className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -326,7 +327,7 @@ export default function TailorPage() {
                   {/* Quick link to cover letter generation */}
                   <Link
                     href="/dashboard/cover-letter"
-                    className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition-colors text-center"
+                    className="flex-1 bg-green-600 text-white py-3 px-3 rounded-md hover:bg-green-700 transition-colors text-center"
                   >
                     Generate Cover Letter
                   </Link>

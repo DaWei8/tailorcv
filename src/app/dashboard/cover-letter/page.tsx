@@ -10,6 +10,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import UserMenu from "@/components/UserMenu";
 import { PageHeading } from "@/components/PageHeading";
+import LogoMain from "@/components/Logo";
 
 const JD_STORAGE_KEY = "saved_job_description";
 const COVER_LETTER_STORAGE_KEY = "generated_cover_letters";
@@ -92,9 +93,6 @@ const coverLetterStorage = {
 
 export default function CoverLetterPage() {
 
-    // if (!user) {
-    //     redirect('/dashboard')
-    // }
     const [jobDescription, setJobDescription] = useState("");
     const [loading, setLoading] = useState(false);
     const [coverLetter, setCoverLetter] = useState("");
@@ -246,7 +244,7 @@ export default function CoverLetterPage() {
                         </DialogHeader>
 
                         <div className="space-y-4">
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
                                 <p className="text-sm text-blue-800 mb-2">
                                     <span className="font-medium">Found saved job description</span>
                                     <br />
@@ -256,7 +254,7 @@ export default function CoverLetterPage() {
 
                             <div className="space-y-2">
                                 <Label className="text-sm font-medium">Preview (first 200 words):</Label>
-                                <div className="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                                <div className="bg-gray-50 rounded-md p-3 max-h-40 overflow-y-auto">
                                     <p className="text-sm text-gray-700 whitespace-pre-wrap">
                                         {getPreviewText(savedJD.text)}
                                     </p>
@@ -293,6 +291,8 @@ export default function CoverLetterPage() {
                             <ArrowLeft />
                         </Link>
 
+                        <LogoMain />
+
                         {/* Clear saved data button */}
                         {savedJD ? (
                             <div className="flex items-center justify-end gap-2">
@@ -324,7 +324,7 @@ export default function CoverLetterPage() {
 
                 {/* Auto-save indicator */}
                 {jobDescription.trim() && isInitialized && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-2">
+                    <div className="bg-green-50 border border-green-200 rounded-md p-2">
                         <p className="text-xs text-green-700 text-center">
                             ✓ Job description will be saved automatically
                         </p>

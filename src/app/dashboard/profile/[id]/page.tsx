@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from "uuid";
 import { profileSchema, experienceSchema, educationSchema, certSchema, langSchema, skillSchema } from "@/lib/schemas";
 import type { ProfileForm, ExperienceForm, EducationForm, CertForm, LangForm, SkillForm, Profile } from "@/lib/schemas";
 import Link from "next/link";
+import LogoMain from "@/components/Logo";
 
 // Ensure schemas align with form types
 const experienceArraySchema = z.object({ items: z.array(experienceSchema) });
@@ -124,7 +125,7 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, profil
                 <button
                     type="button"
                     onClick={() => append({ ...addDefault, id: uuidv4() } as T)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     aria-label={`Add new ${title}`}
                 >
                     <PlusCircle size={16} />
@@ -133,7 +134,7 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, profil
 
             <div className="space-y-4">
                 {fields.map((field, i) => (
-                    <div key={field.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                    <div key={field.id} className="bg-white border border-gray-200 rounded-md p-6 shadow-sm">
                         <div className="space-y-4">
                             {children(i, field as T & { id: string })}
                         </div>
@@ -141,7 +142,7 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, profil
                             <button
                                 type="button"
                                 onClick={() => remove(i)}
-                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                className="inline-flex items-center px-3 py-3 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                 aria-label={`Remove ${title} item`}
                             >
                                 <Trash2 size={16} className="mr-2" />
@@ -156,7 +157,7 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, profil
                 <button
                     type="button"
                     onClick={save}
-                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-3 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                     Save {title}
                 </button>
@@ -368,7 +369,7 @@ export default function ProfileEditPage() {
                                 <div className="flex justify-end">
                                     <button
                                         type="submit"
-                                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        className="inline-flex items-center px-3 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                     >
                                         Save Basic Info
                                     </button>
@@ -589,6 +590,7 @@ export default function ProfileEditPage() {
                         <Link className="w-8 h-8 text-gray-700 hover:text-gray-900" href="/dashboard/profile">
                             <ArrowLeft />
                         </Link>
+                        <LogoMain />
                         <div className="flex items-center">
                             <h1 className="text-xl flex items-center justify-center font-bold text-gray-900">
                                 {profile.full_name}
@@ -640,7 +642,7 @@ export default function ProfileEditPage() {
                         <button
                             onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
                             disabled={currentStep === 0}
-                            className={`inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md ${currentStep === 0
+                            className={`inline-flex items-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md ${currentStep === 0
                                 ? 'text-gray-400 bg-gray-100 cursor-not-allowed'
                                 : 'text-gray-700 bg-white hover:bg-gray-50'
                                 }`}
@@ -652,7 +654,7 @@ export default function ProfileEditPage() {
                         <button
                             onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
                             disabled={currentStep === steps.length - 1}
-                            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md ${currentStep === steps.length - 1
+                            className={`inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md ${currentStep === steps.length - 1
                                 ? 'text-gray-400 bg-gray-100 cursor-not-allowed'
                                 : 'text-white bg-blue-600 hover:bg-blue-700'
                                 }`}

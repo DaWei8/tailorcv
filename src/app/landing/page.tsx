@@ -25,7 +25,7 @@ export default function LandingPage() {
 
         <Link
           href="/dashboard"
-          className="inline-flex sticky top-16 items-center space-x-2 hover:shadow-2xl hover:shadow-blue-500 bg-blue-600 text-white px-4 lg:px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition"
+          className="inline-flex sticky top-16 items-center space-x-2 hover:shadow-2xl hover:shadow-blue-500 bg-blue-600 text-white px-4 lg:px-8 py-4 rounded-md text-lg font-semibold hover:bg-blue-700 transition"
         >
           <span>Build My Resume Free</span>
           <ArrowRight className="w-5 h-5" />

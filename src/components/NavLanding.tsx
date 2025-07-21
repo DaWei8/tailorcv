@@ -8,7 +8,7 @@ const NavLanding = () => {
             <Image src={Logo} className="w-24" priority alt="Tailor CV logo" />
             <div className="flex items-center space-x-4" >
                 <Link href="/pricing" className=" text-gray-700 p-4 flex items-center justify-center font-medium ">Pricing</Link>
-                <Link href="/login" className="py-2 px-4 flex items-center justify-center rounded-md border border-blue-600 text-blue-600 font-semibold ">
+                <Link href="/login" className="py-3 px-4 flex items-center justify-center rounded-md border border-blue-600 text-blue-600 font-semibold ">
                     Login
                 </Link>
             </div>

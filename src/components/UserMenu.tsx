@@ -82,7 +82,7 @@ export default function UserMenu() {
 
       {/* Dropdown Menu */}
       {showMenu && (
-        <div className="absolute right-4 top-[80px] z-50 bg-white shadow-lg rounded-lg border w-48">
+        <div className="absolute right-4 top-[80px] z-50 bg-white shadow-lg rounded-md border w-48">
           <button
             onClick={() => {
               setShowHistory(true)
@@ -116,19 +116,19 @@ export default function UserMenu() {
       {/* Logout Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] max-w-sm">
+          <div className="bg-white p-6 rounded-md shadow-xl w-[90%] max-w-sm">
             <h2 className="text-lg font-semibold mb-4">Confirm Logout</h2>
             <p className="mb-6 text-sm text-gray-600">Are you sure you want to logout?</p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                className="px-4 py-3 bg-gray-200 rounded hover:bg-gray-300"
               >
                 Cancel
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-4 py-3 bg-red-500 text-white rounded hover:bg-red-600"
               >
                 Logout
               </button>

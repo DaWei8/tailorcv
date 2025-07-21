@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import UserMenu from "@/components/UserMenu";
 import { PageHeading } from "@/components/PageHeading";
+import LogoMain from "@/components/Logo";
 
 interface ATSResult {
   score: number;
@@ -327,7 +328,7 @@ export default function ATSScanner() {
         {toasts.map(toast => (
           <div
             key={toast.id}
-            className={`flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300 ${toast.type === "success" ? "bg-green-500" : toast.type === "error" ? "bg-red-500" : "bg-orange-500"}`}
+            className={`flex items-center gap-2 px-4 py-3 rounded-md shadow-lg text-white text-sm font-medium transition-all duration-300 ${toast.type === "success" ? "bg-green-500" : toast.type === "error" ? "bg-red-500" : "bg-orange-500"}`}
           >
             {toast.type === "success" && <CheckCircle2 size={16} />}
             {toast.type === "error" && <XCircle size={16} />}
@@ -343,10 +344,10 @@ export default function ATSScanner() {
       <div className="bg-white mb-4 w-full px-4 lg:px-8 shadow">
         <div className="max-w-7xl mx-auto ">
           <div className="flex justify-between text-gray-700 items-center py-6">
-
             <Link className="" href="/dashboard">
               <ArrowLeft />
             </Link>
+            <LogoMain />
             <div className="flex items-center justify-end " >
               <UserMenu />
             </div>
@@ -360,7 +361,7 @@ export default function ATSScanner() {
 
         <div className="bg-white mx-auto max-w-2xl gap-4 flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
           <h2 className="text-2xl font-bold w-full mb-2 text-gray-600 text-center">Fix and Upgrade your resume</h2>
-          <p className="bg-blue-50 text-sm border text-blue-400 border-blue-200 rounded-lg p-4">
+          <p className="bg-blue-50 text-sm border text-blue-400 border-blue-200 rounded-md p-4">
             Upload your resume and job description to get an instant ATS compatibility score
             with actionable insights to improve your chances.
           </p>
@@ -389,7 +390,7 @@ export default function ATSScanner() {
                     onDrop={handleDrop}
                     className={`
               flex flex-col items-center justify-center w-full h-32 
-              border-2 border-dashed rounded-lg cursor-pointer 
+              border-2 border-dashed rounded-md cursor-pointer 
               transition-all duration-200 ease-in-out
               ${isDragOver
                         ? 'border-blue-500 bg-blue-50 scale-105'
@@ -425,10 +426,10 @@ export default function ATSScanner() {
 
                 {/* File Preview */}
                 {file && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="mt-4 p-4 bg-gray-50 rounded-md">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white rounded-lg border">
+                        <div className="p-2 bg-white rounded-md border">
                           <FileText className="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
@@ -463,7 +464,7 @@ export default function ATSScanner() {
                 {file && (
                   <div className="mt-4">
                     <button
-                      className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium 
+                      className="w-full bg-blue-600 text-white py-3 px-4 rounded-md font-medium 
                        hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
                       Process Resume
@@ -483,7 +484,7 @@ export default function ATSScanner() {
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={8}
                 placeholder="Paste the complete job description here. Include requirements, responsibilities, and preferred qualifications for the most accurate analysis..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               />
               <p className="text-sm text-gray-500 mt-1">
                 <strong>Tip:</strong> For best results, use the complete job posting including requirements and qualifications.
@@ -495,7 +496,7 @@ export default function ATSScanner() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-md font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -513,7 +514,7 @@ export default function ATSScanner() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gradient-to-br from-blue-50 to-indigo-100transition-colors"
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gradient-to-br from-blue-50 to-indigo-100transition-colors"
               >
                 Reset
               </button>
@@ -542,7 +543,7 @@ export default function ATSScanner() {
 
               <div className="p-6 space-y-6">
                 {/* Score Display */}
-                <div className={`text-center p-6 rounded-lg border-2 ${getScoreBackground(result.score)}`}>
+                <div className={`text-center p-6 rounded-md border-2 ${getScoreBackground(result.score)}`}>
                   <div className={`text-6xl font-bold ${getScoreColor(result.score)} mb-2`}>
                     {result.score}
                     <span className="text-2xl text-gray-500">/100</span>
@@ -553,7 +554,7 @@ export default function ATSScanner() {
                 {/* Analysis Grid */}
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* Strengths */}
-                  <div className="bg-green-50 rounded-lg p-4">
+                  <div className="bg-green-50 rounded-md p-4">
                     <h3 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
                       <CheckCircle2 className="w-5 h-5" />
                       Strengths ({result.matchedKeywords.length})
@@ -569,7 +570,7 @@ export default function ATSScanner() {
                   </div>
 
                   {/* Improvements */}
-                  <div className="bg-red-50 rounded-lg p-4">
+                  <div className="bg-red-50 rounded-md p-4">
                     <h3 className="font-semibold text-red-800 mb-3 flex items-center gap-2">
                       <XCircle className="w-5 h-5" />
                       Areas for Improvement ({result.missingKeywords.length})
@@ -586,7 +587,7 @@ export default function ATSScanner() {
                 </div>
 
                 {/* Recommendations */}
-                <div className="bg-blue-50 rounded-lg p-4">
+                <div className="bg-blue-50 rounded-md p-4">
                   <h3 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
                     <Clock className="w-5 h-5" />
                     Recommendations
@@ -605,14 +606,14 @@ export default function ATSScanner() {
                 <div className="flex gap-4 pt-4">
                   <button
                     onClick={() => downloadReport(result, file?.name.split('.')[0] || 'Resume')}
-                    className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 bg-green-600 text-white py-3 px-6 rounded-md font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                   >
                     <Download className="w-5 h-5" />
                     Download Detailed Report
                   </button>
                   <button
                     onClick={() => setShowModal(false)}
-                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gradient-to-br from-blue-50 to-indigo-100transition-colors"
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gradient-to-br from-blue-50 to-indigo-100transition-colors"
                   >
                     Close
                   </button>

@@ -5,8 +5,7 @@ import Link from "next/link";
 import Logo from "../../../public/logo2.svg";
 import Image from "next/image";
 import UserMenu from "@/components/UserMenu";
-// import PDFTextExtractor from "@/components/PDFTextExtractor";
-// import { queryUserId } from "@/lib/queryUserId";
+
 
 const resumeCards = [
     {
@@ -89,7 +88,7 @@ export default async function DashboardPage() {
                     <div className="flex justify-between w-full items-center px-4 pt-4 pb-4">
                         <div className=" flex items-end gap-2 " >
                             <Link href="/dashboard" className="font-bold text-xl">
-                                <Image src={Logo} className="w-24" alt="Tailor CV logo" />
+                                <Image src={Logo} width={100} height={30} className="w-24" alt="Tailor CV logo" />
                             </Link>
                             <p className="px-2 py-1 text-green-600 font-medium bg-green-100 w-fit text-[12px] border border-green-600 rounded-full" >Free plan</p>
                         </div>
@@ -113,7 +112,7 @@ export default async function DashboardPage() {
                 ))}
             </div>
             {/* Disclaimer */}
-            <div className="bg-amber-50 text-sm max-w-5xl w-[90vw] mx-4 lg:mx-0 border-amber-400 lg:p-5 p-3 rounded-lg ">
+            <div className="bg-amber-50 text-sm max-w-5xl w-[90vw] mx-4 lg:mx-0 border-amber-400 lg:p-5 p-3 rounded-md ">
                 <div className="flex items-start  gap-3">
                     <div>
                         <h3 className="font-bold text-lg flex text-amber-700 mb-2">      <AlertCircle className="w-5 h-5 text-amber-700 mt-0.5 flex-shrink-0 mr-2" />Important Notice</h3>

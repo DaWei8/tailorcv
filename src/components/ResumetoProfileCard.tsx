@@ -198,7 +198,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                 <div className="mt-6 flex justify-center">
                     <button
                         onClick={handleParseResume}
-                        className="px-4 py-3 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-900 transition-colors flex items-center gap-2"
+                        className="px-4 py-3 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-900 transition-colors flex items-center gap-2"
                     >
                         <FileText className="h-5 w-5" />
                         Parse Resume
@@ -207,7 +207,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
             )}
 
             {error && (
-                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md flex items-center gap-2 text-red-700">
                     <AlertCircle className="h-5 w-5 flex-shrink-0" />
                     {error}
                 </div>
@@ -233,7 +233,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                     <div className="flex gap-2">
                         <button
                             onClick={() => setIsEditing(!isEditing)}
-                            className={`px-3 text-sm py-2 rounded-lg flex items-center gap-2 transition-colors ${isEditing
+                            className={`px-3 text-sm py-3 rounded-md flex items-center gap-2 transition-colors ${isEditing
                                 ? 'bg-gray-600 text-white hover:bg-gray-700'
                                 : 'bg-blue-600 text-white hover:bg-blue-700'
                                 }`}
@@ -243,7 +243,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                         </button>
                         <button
                             onClick={resetComponent}
-                            className="px-2 py-2 text-sm bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                            className="px-2 py-3 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
                         >
                             Start Over
                         </button>
@@ -252,7 +252,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
 
                 <div className="space-y-6">
                     {/* Personal Information */}
-                    <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="bg-white border border-gray-200 rounded-md p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <User className="h-5 w-5" />
                             Personal Information
@@ -265,7 +265,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                                         type="text"
                                         value={editableProfile.name}
                                         onChange={(e) => handleEditField('name', e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 ) : (
                                     <p className="text-gray-900">{editableProfile.name}</p>
@@ -278,7 +278,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                                         type="email"
                                         value={editableProfile.email || ''}
                                         onChange={(e) => handleEditField('email', e.target.value || null)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 ) : (
                                     <p className="text-gray-900">{editableProfile.email || 'Not provided'}</p>
@@ -291,7 +291,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                                         type="tel"
                                         value={editableProfile.phone || ''}
                                         onChange={(e) => handleEditField('phone', e.target.value || null)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 ) : (
                                     <p className="text-gray-900">{editableProfile.phone || 'Not provided'}</p>
@@ -304,7 +304,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                                         type="text"
                                         value={editableProfile.location || ''}
                                         onChange={(e) => handleEditField('location', e.target.value || null)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 ) : (
                                     <p className="text-gray-900">{editableProfile.location || 'Not provided'}</p>
@@ -319,7 +319,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                                         value={editableProfile.summary}
                                         onChange={(e) => handleEditField('summary', e.target.value || null)}
                                         rows={3}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 ) : (
                                     <p className="text-gray-900">{editableProfile.summary}</p>
@@ -330,14 +330,14 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
 
                     {/* Skills */}
                     {editableProfile.skills.length > 0 && (
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
+                        <div className="bg-white border border-gray-200 rounded-md p-6">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                 <Code className="h-5 w-5" />
                                 Skills ({editableProfile.skills.length})
                             </h3>
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {editableProfile.skills.map((skill, index) => (
-                                    <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                                    <div key={index} className="p-3 bg-gray-50 rounded-md">
                                         <div className="font-medium text-gray-900">{skill.skill}</div>
                                         <div className="text-sm text-gray-600">{skill.level}</div>
                                         {skill.category && (
@@ -351,7 +351,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
 
                     {/* Experience */}
                     {editableProfile.experience.length > 0 && (
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
+                        <div className="bg-white border border-gray-200 rounded-md p-6">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                 <Briefcase className="h-5 w-5" />
                                 Experience ({editableProfile.experience.length})
@@ -384,7 +384,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
 
                     {/* Education */}
                     {editableProfile.education.length > 0 && (
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
+                        <div className="bg-white border border-gray-200 rounded-md p-6">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                 <GraduationCap className="h-5 w-5" />
                                 Education ({editableProfile.education.length})
@@ -405,7 +405,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
 
                     {/* Projects */}
                     {editableProfile.projects.length > 0 && (
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
+                        <div className="bg-white border border-gray-200 rounded-md p-6">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                 <Code className="h-5 w-5" />
                                 Projects ({editableProfile.projects.length})
@@ -439,7 +439,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                 <div className="flex justify-center mt-8">
                     <button
                         onClick={handleSaveProfile}
-                        className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 "
+                        className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center gap-2 "
                     >
                         <Save className="h-5 w-5" />
                         Save Profile
@@ -447,7 +447,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                 </div>
 
                 {error && (
-                    <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+                    <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-md flex items-center gap-2 text-red-700">
                         <AlertCircle className="h-5 w-5 flex-shrink-0" />
                         {error}
                     </div>
@@ -474,7 +474,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
             <div className="flex gap-4 justify-center">
                 <button
                     onClick={resetComponent}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 >
                     Parse Another Resume
                 </button>

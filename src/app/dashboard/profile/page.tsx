@@ -222,7 +222,7 @@ export default function ProfileManagementPage() {
           <div className="mb-8">
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <Plus className="w-4 h-4 mr-2" />
               Create New Profile
@@ -238,7 +238,7 @@ export default function ProfileManagementPage() {
             <p className="text-gray-500 mb-6">Create your first profile to get started</p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              className="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
             >
               <Plus className="w-4 h-4 mr-2" />
               Create Profile
@@ -255,7 +255,7 @@ export default function ProfileManagementPage() {
             {profiles.map((profile) => (
               <div
                 key={profile.id}
-                className={`bg-white h-64 min-w-[250px] rounded-lg flex flex-col justify-between shadow-sm border-2 p-6 hover:shadow-md transition-shadow ${profile.is_master ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'
+                className={`bg-white h-64 min-w-[250px] rounded-md flex flex-col justify-between shadow-sm border-2 p-6 hover:shadow-md transition-shadow ${profile.is_master ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'
                   }`}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -286,7 +286,7 @@ export default function ProfileManagementPage() {
                 <div className="flex w-full gap-2">
                   <button
                     onClick={() => editProfile(profile.id)}
-                    className="inline-flex w-full items-center justify-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    className="inline-flex w-full items-center justify-center px-3 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit Profile
@@ -297,7 +297,7 @@ export default function ProfileManagementPage() {
                     <button
                       title="Delete button"
                       onClick={() => deleteProfile(profile.id)}
-                      className="inline-flex items-center justify-center px-3 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
+                      className="inline-flex items-center justify-center px-3 py-3 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -378,7 +378,7 @@ function ProfileModal({ profile, onClose, onSave }: ProfileModalProps) {
           <div className=" absolute inset-0 bg-gray-500 opacity-75" onClick={onClose}></div>
         </div>
 
-        <div className="m-auto absolute top-[25%] flex self-center justify-self-center bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div className="m-auto absolute top-[25%] flex self-center justify-self-center bg-white rounded-md text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
           <form className="w-full h-full" onSubmit={handleSubmit}>
             <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
@@ -395,7 +395,7 @@ function ProfileModal({ profile, onClose, onSave }: ProfileModalProps) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g., Software Engineer Profile"
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
                 </div>
@@ -409,7 +409,7 @@ function ProfileModal({ profile, onClose, onSave }: ProfileModalProps) {
                     onChange={(e) => setHeadline(e.target.value)}
                     placeholder="Brief headline of this profile"
                     rows={3}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -419,14 +419,14 @@ function ProfileModal({ profile, onClose, onSave }: ProfileModalProps) {
               <button
                 type="submit"
                 disabled={saving}
-                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-3 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
               >
                 {saving ? "Saving..." : (profile ? "Update" : "Create")}
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
               >
                 Cancel
               </button>
