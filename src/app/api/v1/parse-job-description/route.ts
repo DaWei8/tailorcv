@@ -1,6 +1,6 @@
+import { createClient } from "@/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
-import { createClient } from "@/lib/supabase";
 
 // Enhanced prompt with detailed instructions and examples
 const prompt = `You are a specialized job description parser. Extract information from job descriptions and return ONLY valid JSON with the following structure:

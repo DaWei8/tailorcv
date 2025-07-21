@@ -32,7 +32,7 @@
 
 body {
   background: var(--foreground);
-  color: var(--background);
+  color: #000;
   font-family: Poppins, Helvetica, sans-serif;
   min-height: 100vh;
   padding: 0;

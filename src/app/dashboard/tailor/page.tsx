@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { Loader2, WandSparkles, ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
 import DownloadResumeButton from "@/components/DownloadResumeButton";
-import { ResumeData, Skill } from "@/lib/schemas";
+import { ResumeData } from "@/lib/schemas";
 import UserMenu from "@/components/UserMenu";
 import ResumePDF from "@/components/resume-templates/ResumePDf";
 import { PageHeading } from "@/components/PageHeading";
@@ -302,7 +302,7 @@ export default function TailorPage() {
                     <ResumePDF data={preview.resume} />
                   </div>
                   {/* Skills highlight */}
-                  <div className="w-full p-2 rounded-md bg-gray-50">
+                  {/* <div className="w-full p-2 rounded-md bg-gray-50">
                     <h3 className="text-sm font-semibold mb-2">Skills matched</h3>
                     <div className="flex flex-wrap gap-2">
                       {(preview.resume.skills.map((s: Skill) => s.skill) as { skills?: string[] })?.skills?.map((s, i) => (
@@ -314,7 +314,7 @@ export default function TailorPage() {
                         </span>
                       ))}
                     </div>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full">

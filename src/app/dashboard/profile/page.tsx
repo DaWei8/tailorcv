@@ -73,6 +73,7 @@ export default function ProfileManagementPage() {
     }
   }, [userId, loadProfiles]);
 
+
   // Create new profile
   const createProfile = async (full_name: string, headline: string) => {
     if (!userId) return;
@@ -222,7 +223,7 @@ export default function ProfileManagementPage() {
         {/* Create New Profile Button */}
         {profiles.length < MAX_PROFILES && (
           <div className="mb-8 w-full flex items-center justify-between ">
-            <div className=" flex">
+            <div className="flex">
               <div className="inline-flex gap-1" >
                 <div className={`w-12 h-12 rounded-full -mr-8 ${profiles.length >= 1 ? "bg-blue-300": "bg-gray-300"} border-2 border-gray-100 `} ></div>
                 <div className={`w-12 h-12 rounded-full -mr-8 ${profiles.length >= 2 ? "bg-green-300": "bg-gray-300"} border-2 border-gray-100 `} ></div>
@@ -246,7 +247,7 @@ export default function ProfileManagementPage() {
 
         {/* Profiles Grid */}
         {profiles.length === 0 ? (
-          <div className="text-center w-full py-12">
+          <div className="text-center w-full gap-6 py-12">
             <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No profiles yet</h3>
             <p className="text-gray-500 mb-6">Create your first profile to get started</p>

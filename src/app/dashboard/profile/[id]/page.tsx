@@ -58,7 +58,7 @@ interface SectionProps<T> {
 
 function Section<T extends FieldValues>({ title, form, table, addDefault, profileId, children }: SectionProps<T>) {
     const { fields, append, remove } = useFieldArray({
-        control: form.control,  
+        control: form.control,
         name: "items" as never,
     });
 
@@ -591,19 +591,19 @@ export default function ProfileEditPage() {
                             <ArrowLeft />
                         </Link>
                         <LogoMain />
-                        <div className="flex items-center">
-                            <h1 className="text-xl flex items-center justify-center font-bold text-gray-900">
-                                {profile.full_name}
-                            </h1>
-                            {profile.is_master && (
-                                <Star className="w-5 h-5 text-yellow-500 ml-2 fill-current" />
-                            )}
-                        </div>
                         <div className="text-sm text-gray-500">
                             Step {currentStep + 1} of {steps.length}
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className="flex w-full justify-center py-4 items-center">
+                <h1 className="text-xl flex items-center justify-center font-bold text-gray-900">
+                    {profile.full_name}
+                </h1>
+                {profile.is_master && (
+                    <Star className="w-5 h-5 text-yellow-500 ml-2 fill-current" />
+                )}
             </div>
 
             {/* Step Navigation */}

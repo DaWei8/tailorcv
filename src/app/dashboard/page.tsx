@@ -6,7 +6,6 @@ import Logo from "../../../public/logo2.svg";
 import Image from "next/image";
 import UserMenu from "@/components/UserMenu";
 
-
 const resumeCards = [
     {
         title: "Master Profile",
@@ -64,18 +63,11 @@ const resumeCards = [
     },
 ];
 
-
-
 export default async function DashboardPage() {
-
-
     const supabase = await createClient()
-
     const {
         data: { user },
     } = await supabase.auth.getUser()
-
-
     if (!user) {
         redirect('/login')
     }

@@ -218,7 +218,7 @@ Return only a valid JSON object with these exact keys and shapes:
 }
 
 Rules:
-- Do not add or invent any information that does not already exist in the profile.
+- Do NOT ADD or invent any information that does not already exist in the profile.
 - Re-order and re-phrase bullet points and descriptions so they mirror the job description’s keywords.
 - Quantify achievements wherever numbers are available in the profile.
 - Use concise, strong action verbs.

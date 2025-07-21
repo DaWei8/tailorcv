@@ -45,12 +45,10 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                 return;
             }
 
-            // Validate file size (max 10MB)
-            if (file.size > 10 * 1024 * 1024) {
+            if (file.size > 5 * 1024 * 1024) {
                 setError('File size must be less than 10MB');
                 return;
             }
-
             setSelectedFile(file);
             setError(null);
         }
@@ -58,7 +56,6 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
 
     const handleParseResume = async () => {
         if (!selectedFile) return;
-
         setStep('parsing');
         setError(null);
 
@@ -174,9 +171,10 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                 onDragOver={(e) => e.preventDefault()}
                 title="Click to upload from device or drag and drop"
             >
+                <h1 className='text-gray-900 w-[90%] text-lg font-semibold mb-4' >Create Profile from CV</h1>
                 <Upload className="h-12 w-12 text-gray-400 mb-2" />
                 <div className="text-base w-[80%] flex flex-col mb-3 font-semibold text-gray-900">
-                    {selectedFile ? selectedFile.name : 'Choose a file or drag it here'}
+                    {selectedFile ? selectedFile.name : 'Choose a CV or drag it here'}
                     {selectedFile && <p className='text-sm font-light' >{(selectedFile.size / 1024).toFixed(0)}kb</p>}
                 </div>
                 {!selectedFile && <p className="text-sm text-gray-500">PDF, Word, or Text files up to 5MB</p>}

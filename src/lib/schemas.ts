@@ -1,3 +1,4 @@
+import { Timestamp } from "next/dist/server/lib/cache-handlers/types";
 import { z } from "zod";
 
 // ---------------- Basic Profile ----------------
@@ -207,4 +208,13 @@ export interface Skill {
   skill: string;
   category?: "Soft Skill" | "Hard Skill" | "Technical Skill";
   level: string;
+}
+
+export interface JobDescription {
+  id: string;
+  // user_id: string;
+  raw_text: string;
+  parsed: string;
+  created_at: Timestamp;
+  // user_profile_id: string;
 }

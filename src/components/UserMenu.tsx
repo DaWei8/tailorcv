@@ -1,15 +1,18 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import type { User } from "@supabase/supabase-js"
 import { createClient } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
+import toast from "react-hot-toast"
+import { JobDescription } from "@/lib/schemas"
 
 export default function UserMenu() {
   const [showMenu, setShowMenu] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
+  const [history, setHistory] = useState<JobDescription[] | null>(null)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -44,6 +47,25 @@ export default function UserMenu() {
     router.push("/login")
   }
 
+  const loadHistory = useCallback(async () => {
+
+    setLoading(true);
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("job_descriptions")
+      .select("id, raw_text, parsed, created_at")
+      .eq("user_id", user?.id)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      toast.error("Failed to load job history");
+      console.error(error);
+    } else {
+      setHistory(data ?? []); // Replace with your own state handler
+    }
+    setLoading(false);
+  }, [user?.id]);
+
   // Don't render anything while loading
   if (loading) {
     return (
@@ -63,8 +85,8 @@ export default function UserMenu() {
         <div className="w-full flex flex-col items-center justify-center mx-auto">
           <div className="flex justify-between w-full items-center">
             {/* Profile */}
-            <button 
-              title="clickable profile image button" 
+            <button
+              title="clickable profile image button"
               className=" cursor-pointer "
               onClick={() => setShowMenu(!showMenu)}
             >
@@ -82,13 +104,14 @@ export default function UserMenu() {
 
       {/* Dropdown Menu */}
       {showMenu && (
-        <div className="absolute right-4 top-[80px] z-50 bg-white shadow-lg rounded-md border w-48">
+        <div className="absolute p-3 right-4 top-[80px] z-50 bg-white shadow-lg rounded-md border w-48 lg:w-72">
           <button
             onClick={() => {
+              loadHistory()
               setShowHistory(true)
               setShowMenu(false)
             }}
-            className="w-full px-4 py-4 text-left cursor-pointer hover:bg-gray-100"
+            className="w-full px-4 rounded-md py-4 text-left cursor-pointer hover:bg-gray-100"
           >
             View History
           </button>
@@ -97,16 +120,43 @@ export default function UserMenu() {
             onClick={() => {
               setShowMenu(false)
             }}
-            className="w-full px-4 py-4 text-left cursor-pointer hover:bg-gray-100"
+            className="w-full flex px-4 rounded-md py-4 text-left cursor-pointer hover:bg-gray-100"
           >
             Switch Profile
+          </Link>
+          <Link
+            href="/dashboard/tailor"
+            onClick={() => {
+              setShowMenu(false)
+            }}
+            className="w-full flex px-4 rounded-md py-4 text-left cursor-pointer hover:bg-gray-100"
+          >
+            Tailor Resume
+          </Link>
+          <Link
+            href="/dashboard/ats"
+            onClick={() => {
+              setShowMenu(false)
+            }}
+            className="w-full flex px-4 rounded-md py-4 text-left cursor-pointer hover:bg-gray-100"
+          >
+            ATS Resume Review
+          </Link>
+          <Link
+            href="/dashboard/cover-letter"
+            onClick={() => {
+              setShowMenu(false)
+            }}
+            className="w-full flex px-4 rounded-md py-4 text-left cursor-pointer hover:bg-gray-100"
+          >
+            Craft Cover Letter
           </Link>
           <button
             onClick={() => {
               setShowLogoutModal(true)
               setShowMenu(false)
             }}
-            className="w-full px-4 py-4 cursor-pointer text-left hover:bg-gray-100 text-red-600"
+            className="w-full px-4 rounded-md py-4 cursor-pointer text-left hover:bg-gray-100 text-red-600"
           >
             Logout
           </button>
@@ -146,7 +196,19 @@ export default function UserMenu() {
           </div>
           <div className="p-4">
             {/* History content here */}
-            <p className="text-sm text-gray-500">Your recent resume generations will appear here.</p>
+            {history?.length !== 0 ? history?.map((job) => {
+              return (<div key={job.id} className="bg-white shadow-sm border border-gray-200 rounded-xl p-4 max-w-2xl mb-4">
+                <div className="text-sm text-gray-500">{new Date(job.created_at).toLocaleString()}</div>
+                <div className="mt-2 text-base text-gray-800 line-clamp-4">
+                  {job.raw_text}
+                </div>
+                {job.parsed && (
+                  <div className="mt-2 text-xs text-green-600 font-medium">
+                    ✅ Parsed
+                  </div>
+                )}
+              </div>)
+            }) : <p className="text-sm text-gray-500">Your recent resume generations will appear here.</p>}
           </div>
         </div>
       )}
