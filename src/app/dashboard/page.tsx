@@ -83,7 +83,7 @@ export default async function DashboardPage() {
     return (
         <main className="min-h-screen relative w-[100%] bg-gray-50  flex items-center flex-col text-black gap-12 pb-20">
             {/* Header */}
-            <div className="bg-white w-full shadow">
+            <div className="bg-white sticky top-0 z-50 w-full shadow">
                 <div className="w-full flex flex-col items-center justify-center mx-auto">
                     <div className="flex justify-between w-full items-center px-4 pt-4 pb-4">
                         <div className=" flex items-end gap-2 " >

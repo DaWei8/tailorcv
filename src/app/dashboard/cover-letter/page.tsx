@@ -284,7 +284,7 @@ export default function CoverLetterPage() {
             )}
 
             {/* Header */}
-            <div className="bg-white w-full shadow">
+            <div className="bg-white sticky top-0 z-50 w-full shadow">
                 <div className="max-w-7xl w-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center py-6">
                         <Link className="" href="/dashboard">
@@ -332,7 +332,7 @@ export default function CoverLetterPage() {
                 )}
 
                 <div className="w-full space-y-2">
-                    <Label className="text-md font-semibold text-gray-600" htmlFor="job-description">Job Description</Label>
+                    <Label className="text-md hidden font-semibold text-gray-600" htmlFor="job-description">Job Description</Label>
                     <Textarea
                         id="job-description"
                         placeholder="Paste your job description, and we'll generate a polished cover letter designed to leave a lasting impression."

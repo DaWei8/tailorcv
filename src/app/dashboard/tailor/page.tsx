@@ -206,7 +206,7 @@ export default function TailorPage() {
     <div className="min-h-screen flex flex-col items-center bg-gray-50 text-gray-900 mx-auto space-y-6 pb-20">
 
       {/* Header */}
-      <div className="bg-white w-full shadow">
+      <div className="bg-white sticky top-0 z-50 w-full shadow">
         <div className="max-w-7xl w-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <Link className="" href="/dashboard">
@@ -216,14 +216,6 @@ export default function TailorPage() {
             {/* Clear storage button */}
             {preview ? (
               <div className="flex items-center justify-end gap-2 float-right" >
-                <button
-                  onClick={clearStoredData}
-                  className="flex items-center gap-2 px-3 py-3 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                  title="Clear stored resume data"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Clear Data
-                </button>
                 <UserMenu />
               </div>
             ) : (
@@ -282,7 +274,14 @@ export default function TailorPage() {
               </div>
             </div>
           )}
-
+                <button
+                  onClick={clearStoredData}
+                  className="flex items-center w-full justify-center bg-red-100 gap-2 px-3 py-3 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                  title="Clear stored resume data"
+                >
+                  Clear Resume Data
+                  <Trash2 className="w-4 h-4" />
+                </button>
           {/* Preview section */}
           {preview && (
             <div className="w-full flex mt-10 flex-col gap-4 items-center justify-center">

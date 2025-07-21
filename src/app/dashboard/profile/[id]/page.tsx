@@ -584,7 +584,7 @@ export default function ProfileEditPage() {
     return (
         <div className="min-h-screen bg-gray-50 ">
             {/* Header */}
-            <div className="bg-white shadow">
+            <div className="bg-white sticky top-0 z-50 shadow">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center py-6">
                         <Link className="w-8 h-8 text-gray-700 hover:text-gray-900" href="/dashboard/profile">

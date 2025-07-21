@@ -341,10 +341,10 @@ export default function ATSScanner() {
         ))}
       </div>
       {/* Header */}
-      <div className="bg-white mb-4 w-full px-4 lg:px-8 shadow">
-        <div className="max-w-7xl mx-auto ">
-          <div className="flex justify-between text-gray-700 items-center py-6">
-            <Link className="" href="/dashboard">
+      <div className="bg-white w-full sticky top-0 z-50 shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <Link className="text-gray-800" href="/dashboard">
               <ArrowLeft />
             </Link>
             <LogoMain />

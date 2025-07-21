@@ -139,7 +139,7 @@ export default function UserMenu() {
 
       {/* History Sidebar */}
       {showHistory && (
-        <div className="fixed top-0 right-0 w-[30vw] h-full bg-white shadow-lg z-50">
+        <div className="fixed top-0 right-0 w-[70vw] md:w-[40vw] h-full bg-white shadow-lg z-50">
           <div className="flex justify-between items-center px-4 py-3 border-b">
             <h3 className="font-semibold text-lg">History</h3>
             <button onClick={() => setShowHistory(false)}>✕</button>
