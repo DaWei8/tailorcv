@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
     
     // Extract text using pdf-parse with explicit options
     const data = await pdf(buffer, {
-      // Ensure it treats this as a buffer, not a file path
       max: 0, // 0 means no limit on pages
     });
     

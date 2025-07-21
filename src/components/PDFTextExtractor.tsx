@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { pdfjs } from 'react-pdf';
+import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 
 // Use CDN version that matches react-pdf
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
@@ -29,7 +30,8 @@ export default function PDFTextExtractor() {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
         const pageText = content.items
-          .map((item: any) => item.str)
+          .filter((item): item is TextItem => 'str' in item && typeof (item as TextItem).str === 'string')
+          .map((item) => item.str)
           .join(' ')
           .trim();
         

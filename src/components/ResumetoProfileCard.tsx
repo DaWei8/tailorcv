@@ -1,73 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, User, Mail, Phone, MapPin, Briefcase, GraduationCap, Award, Code, Globe, Save, Edit, X, Check, AlertCircle, Loader } from 'lucide-react';
+import { Upload, FileText, User, Briefcase, GraduationCap, Code, Save, Edit, X, Check, AlertCircle, Loader } from 'lucide-react';
+import { ParsedUserProfile } from '@/lib/schemas';
 
-// Type definitions matching your schema
-interface Skill {
-    skill: string;
-    category?: "Soft Skill" | "Hard Skill" | "Technical Skill";
-    level: string;
-}
-
-interface Certification {
-    name: string;
-    issuer: string;
-    issue_date: string;
-    expiry_date: string;
-    credential_id: string;
-    credential_url: string;
-    year: string;
-}
-
-interface Experience {
-    title: string;
-    company: string;
-    duration: string;
-    location: string;
-    responsibilities: string[];
-}
-
-interface Education {
-    field: string;
-    degree: string;
-    description: string;
-    institution: string;
-    location: string;
-    duration: string;
-    gpa?: number;
-}
-
-interface Project {
-    name?: string;
-    description?: string;
-    technologies?: string[];
-    link?: string;
-}
-
-interface Links {
-    linkedin?: string;
-    portfolio?: string;
-    github?: string | null;
-}
-
-interface Language {
-    language: string;
-    level: string;
-}
-
-interface ParsedUserProfile {
-    name: string;
-    email: string | null;
-    phone: string | null;
-    location: string | null;
-    summary: string | null;
-    skills: Skill[];
-    certifications: Certification[];
-    experience: Experience[];
-    education: Education[];
-    projects: Project[];
-    links: Links;
-    languages: Language[];
-}
 
 interface ResumeToProfileCardProps {
     onSaveSuccess?: (profile: ParsedUserProfile) => void;
@@ -90,11 +24,10 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
 
     // Simulated resume parsing function - replace with your actual resume parsing library
     const parseResumeFile = async (file: File): Promise<string> => {
+        console.info(parsedProfile)
         return new Promise((resolve) => {
             const reader = new FileReader();
             reader.onload = (e) => {
-                // This is a placeholder - replace with your actual resume parsing library
-                // e.g., pdf-parse, mammoth for Word docs, etc.
                 const text = e.target?.result as string;
                 resolve(text);
             };
@@ -199,7 +132,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
         }
     };
 
-    const handleEditField = (field: keyof ParsedUserProfile, value: any) => {
+    const handleEditField = (field: keyof ParsedUserProfile, value: unknown) => {
         if (!editableProfile) return;
         setEditableProfile({
             ...editableProfile,
@@ -219,6 +152,13 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
         }
     };
 
+    const simulateFileSelectEvent = (file: File): React.ChangeEvent<HTMLInputElement> => {
+        return {
+            target: {
+                files: [file]
+            }
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
+    };
     const renderUploadStep = () => (
         <div className="max-w-2xl w-full ">
 
@@ -229,7 +169,7 @@ const ResumeToProfileCard: React.FC<ResumeToProfileCardProps> = ({
                 onDrop={(e) => {
                     e.preventDefault();
                     const file = e.dataTransfer.files[0];
-                    if (file) handleFileSelect({ target: { files: [file] } } as any);
+                    if (file) handleFileSelect(simulateFileSelectEvent(file));
                 }}
                 onDragOver={(e) => e.preventDefault()}
                 title="Click to upload from device or drag and drop"

@@ -110,7 +110,7 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, profil
                 details: error.details,
                 code: error.code
             });
-            toast.error(`Failed to save ${title}: ${error.message}`);
+            toast.error(`Failed to save ${title} - ${data}: ${error.message}`);
             return;
         }
 
