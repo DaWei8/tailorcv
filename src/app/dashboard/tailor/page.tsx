@@ -7,7 +7,7 @@ import Link from "next/link";
 import DownloadResumeButton from "@/components/DownloadResumeButton";
 import { ResumeData, Skill } from "@/lib/schemas";
 import UserMenu from "@/components/UserMenu";
-import ResumePDF from "@/components/ResumePDf";
+import ResumePDF from "@/components/resume-templates/ResumePDf";
 
 
 interface ParsedJD {

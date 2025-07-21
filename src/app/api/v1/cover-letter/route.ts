@@ -20,6 +20,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("id", user.id)
+    .eq("is_master", true)
+    .single();
+
   const {
     jobDescription,
     resumeData = null, // Get resume data directly from client
@@ -110,10 +117,10 @@ Return only the plain text of the final cover letter, no extra formatting or mar
     const { data: saved, error: saveError } = await supabase
       .from("cover_letters")
       .insert({
-        profile_id: user.id,
+        user_id: user.id,
+        user_profile_id: profile.id,
         resume_id: resumeId, // Use the resume ID from the data
-        job_description: jobDescription,
-        cover_letter_text: coverLetter,
+        letter_text: coverLetter,
       })
       .select()
       .single();
@@ -121,30 +128,30 @@ Return only the plain text of the final cover letter, no extra formatting or mar
     if (saveError) {
       console.error("Error saving cover letter:", saveError);
       // Still return the cover letter even if saving fails
-      return NextResponse.json({ 
+      return NextResponse.json({
         coverLetter,
-        warning: "Cover letter generated but not saved to database"
+        warning: "Cover letter generated but not saved to database",
       });
     }
 
-    return NextResponse.json({ 
-      id: saved?.id, 
+    return NextResponse.json({
+      id: saved?.id,
       coverLetter,
-      success: true 
+      success: true,
     });
   } catch (error: unknown) {
     const err = error as APIError;
     console.error("Gemini API error:", err.response?.data || err.message);
-    
+
     // Handle specific Gemini API errors
-    if (err.message?.includes('API_KEY')) {
+    if (err.message?.includes("API_KEY")) {
       return NextResponse.json(
         { error: "API key configuration error" },
         { status: 500 }
       );
     }
-    
-    if (err.message?.includes('QUOTA_EXCEEDED')) {
+
+    if (err.message?.includes("QUOTA_EXCEEDED")) {
       return NextResponse.json(
         { error: "API quota exceeded. Please try again later." },
         { status: 429 }

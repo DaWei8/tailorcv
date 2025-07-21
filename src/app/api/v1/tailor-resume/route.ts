@@ -63,40 +63,40 @@ export async function POST(request: NextRequest) {
 
     const { jobDescription } = body;
     const { data: profile, error: profileError } = await supabase
-      .from("profiles")
+      .from("user_profiles")
       .select("*")
-      .eq("id", user.id)
+      .eq("id", user.id).eq("is_master", true)
       .single();
 
     const { data: experiences, error: experienceError } = await supabase
       .from("experiences")
       .select("*")
-      .eq("profile_id", user.id);
+      .eq("user_profile_id", profile.id);
 
     const { data: skills, error: skillError } = await supabase
       .from("skills")
       .select("*")
-      .eq("profile_id", user.id);
+      .eq("user_profile_id", user.id);
 
     const { data: education, error: educationError } = await supabase
       .from("education")
       .select("*")
-      .eq("profile_id", user.id);
+      .eq("user_profile_id", profile.id);
 
     const { data: certifications, error: certificationError } = await supabase
       .from("certifications")
       .select("*")
-      .eq("profile_id", user.id);
+      .eq("user_profile_id", profile.id);
 
     const { data: languages, error: languageError } = await supabase
       .from("languages")
       .select("*")
-      .eq("profile_id", user.id);
+      .eq("user_profile_id", profile.id);
 
     const { data: projects, error: projectsError } = await supabase
       .from("projects")
       .select("*")
-      .eq("profile_id", user.id);
+      .eq("user_profile_id", profile.id);
 
     if (
       profileError ||
@@ -313,7 +313,7 @@ Rules:
     const { data: tailoredResume, error: saveError } = await supabase
       .from("tailored_resumes")
       .insert({
-        profile_id: user.id,
+        user_profile_id: profile.id,
         resume_jsonb: resumeJson,
         // ats_score: atsScore,
       })

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { Download, Loader2 } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
 import { ResumeData } from '@/lib/schemas';
-import ResumePDF from './ResumePDf';
+import ResumePDF from './resume-templates/ResumePDf';
 
 // Register the 'Poppins' font family with different weights and styles.
 // This is necessary for @react-pdf/renderer to use custom fonts on the client side.

@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js"
 import { createClient } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import Link from "next/link"
 
 export default function UserMenu() {
   const [showMenu, setShowMenu] = useState(false)
@@ -87,16 +88,25 @@ export default function UserMenu() {
               setShowHistory(true)
               setShowMenu(false)
             }}
-            className="w-full px-4 py-2 text-left cursor-pointer hover:bg-gray-100"
+            className="w-full px-4 py-4 text-left cursor-pointer hover:bg-gray-100"
           >
             View History
           </button>
+          <Link
+            href="/dashboard/profile"
+            onClick={() => {
+              setShowMenu(false)
+            }}
+            className="w-full px-4 py-4 text-left cursor-pointer hover:bg-gray-100"
+          >
+            Switch Profile
+          </Link>
           <button
             onClick={() => {
               setShowLogoutModal(true)
               setShowMenu(false)
             }}
-            className="w-full px-4 py-2 cursor-pointer text-left hover:bg-gray-100 text-red-600"
+            className="w-full px-4 py-4 cursor-pointer text-left hover:bg-gray-100 text-red-600"
           >
             Logout
           </button>

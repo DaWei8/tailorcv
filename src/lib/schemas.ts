@@ -11,6 +11,8 @@ export const profileSchema = z.object({
   linkedin_url: z.string().url().optional(),
   website_url: z.string().url().optional(),
 });
+
+
 export const rprofileSchema = z.object({
   name: z.string().min(2),
   headline: z.string().min(2),
@@ -97,8 +99,25 @@ export const linkSchema = z.object({
   github: z.string().url().optional(),
 })
 
-// ---------------- Resume Data ----------------
 
+export interface Profile {
+  id: string;
+  is_master: boolean;
+  user_id: string;
+  full_name: string;
+  headline: string;
+  summary: string;
+  city: string;
+  country: string;
+  phone: string;
+  linkedin_url: string;
+  website_url: string;
+  created_at: string;
+  updated_at: string;
+
+}
+
+// ---------------- Resume Data ----------------
 
 export interface ResumeData {
   name: string;

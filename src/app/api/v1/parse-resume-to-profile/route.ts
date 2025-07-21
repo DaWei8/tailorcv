@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
-import { createClient } from "@/lib/supabase";
 
 // Enhanced prompt with detailed instructions and examples
-const prompt = `You are a specialized job description parser. Extract information from job descriptions and return ONLY valid JSON with the following structure:
+const prompt = `You are a specialized resume parser. Extract information from the resume provided and return ONLY valid JSON with the following structure:
 {
   "title": "string - The job title/position name",
   "company": "string - Company name if mentioned, otherwise null",
@@ -150,15 +149,6 @@ function isAPIError(error: unknown): error is APIError {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient(); 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     // Check if API key is configured
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "undefined") {
@@ -276,27 +266,6 @@ export async function POST(req: NextRequest) {
 
     // Clean and validate the parsed data
     const cleanedData = cleanAndValidateData(parsed);
-// Save the cover letter to database
-    const { error: saveError } = await supabase
-      .from("job_descriptions")
-      .insert({
-        user_id: user.id,
-        user_profile_id: user.id,
-        parsed: cleanedData, // Use the resume ID from the data
-        raw_text: rawText,
-      })
-      .select()
-      .single();
-
-    if (saveError) {
-      console.error("Error saving cover letter:", saveError);
-      // Still return the cover letter even if saving fails
-      return NextResponse.json({ 
-        cleanedData,
-        warning: "Job description parsed but not saved to database"
-      });
-    }
-    
 
     // Apply options if provided
     if (options.maxSkills) {
@@ -327,7 +296,7 @@ export async function POST(req: NextRequest) {
       cleanedData.salary_range = null;
     }
 
-    console.log("Successfully parsed job description, sending response.");
+    console.log("Successfully parsed resume, sending response.");
     return NextResponse.json({
       ...cleanedData,
       modelVersion: response.data.modelVersion,
@@ -335,7 +304,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error("Job description parsing error:", error);
+    console.error("Resume parsing error:", error);
 
     // Handle specific API errors
     if (isAPIError(error)) {
