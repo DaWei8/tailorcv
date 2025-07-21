@@ -16,17 +16,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
-// import { queryUserId } from "@/lib/queryUserId";
-// import { User } from "@supabase/supabase-js";
 import UserMenu from "@/components/UserMenu";
-// import { createClient } from "@/lib/supabase-server";
-// import { redirect } from "next/navigation";
-
-// const supabase = await createClient()
-
-// const {
-//     data: { user },
-// } = await supabase.auth.getUser()
+import { PageHeading } from "@/components/PageHeading";
 
 interface ATSResult {
   score: number;
@@ -175,9 +166,7 @@ truthfully represents your experience and qualifications.
 }
 
 export default function ATSScanner() {
-      // if (!user) {
-      //     redirect('/dashboard')
-      // }
+
 
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
@@ -332,7 +321,7 @@ export default function ATSScanner() {
   };
 
   return (
-    <div className="min-h-screen h-full w-full flex flex-col items-center bg-gray-50  pb-20">
+    <div className="min-h-screen h-full w-full flex flex-col gap-2 items-center bg-gray-50  pb-20">
       {/* Toast Container */}
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {toasts.map(toast => (
@@ -355,25 +344,23 @@ export default function ATSScanner() {
         <div className="max-w-7xl mx-auto ">
           <div className="flex justify-between text-gray-700 items-center py-6">
 
-            <Link className="w-[30%]" href="/dashboard">
+            <Link className="" href="/dashboard">
               <ArrowLeft />
             </Link>
-            <h1 className="text-xl flex items-center font-bold text-gray-900">
-              ATS score
-            </h1>
-            <div className="w-[30%] flex items-center justify-end " >
+            <div className="flex items-center justify-end " >
               <UserMenu />
             </div>
           </div>
 
         </div>
       </div>
-      <div className="w-full mx-auto flex flex-col gap-8 lg:px-8 px-4 ">
+      <PageHeading title="ATS Engine" />
+      <div className="w-full mx-auto text-sm flex flex-col gap-8 lg:px-8 px-4 ">
         {/* Main Form */}
-        <h2 className="text-2xl font-bold w-full mb-2 text-gray-700 text-center ">Fix and Upgrade your resume</h2>
 
-        <div className="bg-white mx-auto max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
-          <p className="text-sm text-center bg-gray-100 p-3 rounded-lg mb-4 w-full text-gray-600">
+        <div className="bg-white mx-auto max-w-2xl gap-4 flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
+          <h2 className="text-2xl font-bold w-full mb-2 text-gray-600 text-center">Fix and Upgrade your resume</h2>
+          <p className="bg-blue-50 text-sm border text-blue-400 border-blue-200 rounded-lg p-4">
             Upload your resume and job description to get an instant ATS compatibility score
             with actionable insights to improve your chances.
           </p>
@@ -483,17 +470,6 @@ export default function ATSScanner() {
                     </button>
                   </div>
                 )}
-              </div>
-
-              {/* Usage Instructions */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
-                <h3 className="font-semibold text-blue-900 mb-2">How to use:</h3>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Drag and drop your resume file onto the upload area</li>
-                  <li>• Or click the upload area to browse and select a file</li>
-                  <li>• Supported formats: PDF, Word (.docx), and Text (.txt)</li>
-                  <li>• Maximum file size: 10MB</li>
-                </ul>
               </div>
             </div>
 

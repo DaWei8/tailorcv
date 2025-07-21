@@ -57,7 +57,7 @@ interface SectionProps<T> {
 
 function Section<T extends FieldValues>({ title, form, table, addDefault, profileId, children }: SectionProps<T>) {
     const { fields, append, remove } = useFieldArray({
-        control: form.control,
+        control: form.control,  
         name: "items" as never,
     });
 

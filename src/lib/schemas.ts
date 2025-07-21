@@ -117,6 +117,21 @@ export interface Profile {
 
 }
 
+export interface ParsedUserProfile {
+  name: string;
+  email: string | null;
+  phone: string | null;
+  location: string | null;
+  summary: string | null;
+  skills: Skill[];
+  certifications: Certification[];
+  experience: Experience[];
+  education: Education[];
+  projects: Project[];
+  links: Links;
+  languages: Language[];
+}
+
 // ---------------- Resume Data ----------------
 
 export interface ResumeData {
@@ -135,13 +150,14 @@ export interface ResumeData {
   links: Links;
 }
 
+
 export interface Skill {
   skill: string;
   category?: "Soft Skill" | "Hard Skill" | "Technical Skill";
   level: string;
 }
 
-interface Certification {
+export interface Certification {
   name: string;
   issuer: string;
   issue_date: string;
@@ -151,7 +167,7 @@ interface Certification {
   year: string;
 }
 
-interface Experience {
+export interface Experience {
   title: string;
   company: string;
   duration: string;
@@ -159,7 +175,7 @@ interface Experience {
   responsibilities: string[];
 }
 
-interface Education {
+export interface Education {
   field: string;
   degree: string;
   description: string;
@@ -169,20 +185,26 @@ interface Education {
   gpa?: number;
 }
 
-interface Project {
+export interface Project {
   name?: string;
   description?: string;
   technologies?: string[];
   link?: string;
 }
 
-interface Links {
+export interface Links {
   linkedin?: string;
   portfolio?: string;
   github?: string | null;
 }
 
-interface Language {
+export interface Language {
   language: string;
+  level: string;
+}
+
+export interface Skill {
+  skill: string;
+  category?: "Soft Skill" | "Hard Skill" | "Technical Skill";
   level: string;
 }

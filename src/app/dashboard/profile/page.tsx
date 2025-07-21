@@ -2,13 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase";
-import { User, Plus, Edit, Trash2, Star, ArrowLeft } from "lucide-react";
+import { User, Plus, Edit, Trash2, Star, ArrowLeft, RefreshCw, Target, FileText, UploadCloud } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Profile } from "@/lib/schemas";
+import { ParsedUserProfile, Profile } from "@/lib/schemas";
+import ResumeToProfileCard from "@/components/ResumetoProfileCard";
+import { NextResponse } from "next/server";
+import { PageHeading } from "@/components/PageHeading";
 
 
+const supabase = await createClient();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+if (!user) {
+  NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+}
 const MAX_PROFILES = 3;
 
 export default function ProfileManagementPage() {
@@ -44,7 +55,6 @@ export default function ProfileManagementPage() {
       .select("*")
       .eq("user_id", userId)
       .order("created_at", { ascending: true });
-    console.log(data)
 
     if (error) {
       toast.error("Failed to load profiles");
@@ -161,6 +171,15 @@ export default function ProfileManagementPage() {
       loadProfiles();
     }
   };
+  const handleSaveSuccess = (profile: ParsedUserProfile) => {
+    console.log('Profile saved:', profile);
+    // Handle success (e.g., redirect, show notification)
+  };
+
+  const handleError = (error: unknown) => {
+    console.error('Error:', error);
+    // Handle errors (e.g., show toast notification)
+  };
 
   // Navigate to profile editor
   const editProfile = (profileId: string) => {
@@ -179,22 +198,22 @@ export default function ProfileManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col gap-4 bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-6">
             <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-gray-900">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back to Dashboard
+              <ArrowLeft className="w-5 h-5" />
+              Back
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900">My Profiles</h1>
             <div className="text-sm text-gray-500">
               {profiles.length} / {MAX_PROFILES} profiles
             </div>
           </div>
         </div>
       </div>
+      <PageHeading title="Profiles" />
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -213,7 +232,7 @@ export default function ProfileManagementPage() {
 
         {/* Profiles Grid */}
         {profiles.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center w-full py-12">
             <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No profiles yet</h3>
             <p className="text-gray-500 mb-6">Create your first profile to get started</p>
@@ -224,13 +243,19 @@ export default function ProfileManagementPage() {
               <Plus className="w-4 h-4 mr-2" />
               Create Profile
             </button>
+            <ResumeToProfileCard
+              apiEndpoint="/api/v1/parse-resume-to-profile"
+              onError={handleError}
+              onSaveSuccess={handleSaveSuccess}
+            />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <div className="md:grid flex space-y-6 flex-col-reverse md:grid-cols-2 lg:grid-cols-3 w-full gap-6">
             {profiles.map((profile) => (
               <div
                 key={profile.id}
-                className={`bg-white rounded-lg flex flex-col justify-between shadow-sm border-2 p-6 hover:shadow-md transition-shadow ${profile.is_master ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'
+                className={`bg-white h-64 min-w-[250px] rounded-lg flex flex-col justify-between shadow-sm border-2 p-6 hover:shadow-md transition-shadow ${profile.is_master ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'
                   }`}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -288,7 +313,16 @@ export default function ProfileManagementPage() {
                 )}
               </div>
             ))}
+            {
+              profiles.length === MAX_PROFILES ? <></> : <ResumeToProfileCard
+                apiEndpoint="/api/v1/parse-resume-to-profile"
+                onError={handleError}
+                onSaveSuccess={handleSaveSuccess}
+              />
+            }
           </div>
+
+
         )}
       </div>
 

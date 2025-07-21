@@ -9,22 +9,7 @@ import { ArrowLeft, Loader2, WandSparkles, FileText, X, Check } from "lucide-rea
 import Link from "next/link";
 import toast from "react-hot-toast";
 import UserMenu from "@/components/UserMenu";
-// import { createClient } from "@/lib/supabase-server";
-// import { redirect } from "next/navigation";
-// import { queryUserId } from "@/lib/queryUserId";
-// import { User } from "@supabase/supabase-js";
-
-// Storage utilities for job description
-// const user = await queryUserId() as User;
-
-// const supabase = await createClient()
-
-// const {
-//     data: { user },
-// } = await supabase.auth.getUser()
-
-
-
+import { PageHeading } from "@/components/PageHeading";
 
 const JD_STORAGE_KEY = "saved_job_description";
 const COVER_LETTER_STORAGE_KEY = "generated_cover_letters";
@@ -195,7 +180,7 @@ export default function CoverLetterPage() {
                 },
                 body: JSON.stringify({
                     jobDescription,
-                    resumeData, // Send the full resume data
+                    resumeData,
                     tone: "professional"
                 }),
             });
@@ -214,7 +199,6 @@ export default function CoverLetterPage() {
 
             setCoverLetter(data.coverLetter);
 
-            // Save the generated cover letter and update job description storage
             coverLetterStorage.save(data.coverLetter, jobDescription);
             jobDescriptionStorage.save(jobDescription);
 
@@ -305,16 +289,13 @@ export default function CoverLetterPage() {
             <div className="bg-white w-full shadow">
                 <div className="max-w-7xl w-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center py-6">
-                        <Link className="w-[30%]" href="/dashboard">
+                        <Link className="" href="/dashboard">
                             <ArrowLeft />
                         </Link>
-                        <div className="text-xl flex items-center font-bold text-gray-900">
-                            Craft Cover Letter
-                        </div>
 
                         {/* Clear saved data button */}
                         {savedJD ? (
-                            <div className="w-[30%] flex items-center justify-end gap-2">
+                            <div className="flex items-center justify-end gap-2">
                                 <button
                                     onClick={() => {
                                         jobDescriptionStorage.clear();
@@ -336,9 +317,10 @@ export default function CoverLetterPage() {
                     </div>
                 </div>
             </div>
+            <PageHeading title="Cover Letter" />
 
-            <h2 className="text-2xl font-bold w-full mb-2 text-gray-700 text-center ">Paste Your Job Description</h2>
             <div className="bg-white mx-auto max-w-2xl flex flex-col gap-4 rounded-xl shadow-xl lg:p-6 p-4">
+                <h2 className="text-2xl font-bold w-full mb-2 text-gray-600 text-center ">Paste Your Job Description</h2>
 
                 {/* Auto-save indicator */}
                 {jobDescription.trim() && isInitialized && (
@@ -350,7 +332,7 @@ export default function CoverLetterPage() {
                 )}
 
                 <div className="w-full space-y-2">
-                    <Label className="text-md" htmlFor="job-description">Job Description</Label>
+                    <Label className="text-md font-semibold text-gray-600" htmlFor="job-description">Job Description</Label>
                     <Textarea
                         id="job-description"
                         placeholder="Paste your job description, and we'll generate a polished cover letter designed to leave a lasting impression."

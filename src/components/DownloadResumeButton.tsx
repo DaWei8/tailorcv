@@ -6,6 +6,17 @@ import { Download, Loader2 } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
 import { ResumeData } from '@/lib/schemas';
 import ResumePDF from './resume-templates/ResumePDf';
+import { Font } from "@react-pdf/renderer";
+
+Font.register({
+  family: 'Poppins',
+  fonts: [
+    { src: '/fonts/Poppins-Regular.ttf', fontWeight: 400 },
+    { src: '/fonts/Poppins-Medium.ttf',  fontWeight: 500 },
+    { src: '/fonts/Poppins-SemiBold.ttf',fontWeight: 600 },
+    { src: '/fonts/Poppins-Bold.ttf',   fontWeight: 700 },
+  ],
+});
 
 // Register the 'Poppins' font family with different weights and styles.
 // This is necessary for @react-pdf/renderer to use custom fonts on the client side.
@@ -76,7 +87,7 @@ const DownloadResumeButton: React.FC<DownloadResumeButtonProps> = ({
         <button
             onClick={handleDownload}
             disabled={isLoading || !resumeData}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             type="button"
         >
             {isLoading ? (

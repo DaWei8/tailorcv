@@ -8,6 +8,7 @@ import DownloadResumeButton from "@/components/DownloadResumeButton";
 import { ResumeData, Skill } from "@/lib/schemas";
 import UserMenu from "@/components/UserMenu";
 import ResumePDF from "@/components/resume-templates/ResumePDf";
+import { PageHeading } from "@/components/PageHeading";
 
 
 interface ParsedJD {
@@ -208,16 +209,13 @@ export default function TailorPage() {
         <div className="max-w-7xl w-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
 
-            <Link className="w-[30%]" href="/dashboard">
+            <Link className="" href="/dashboard">
               <ArrowLeft />
             </Link>
-            <h1 className="text-xl flex items-center font-bold text-gray-900">
-              Tailor Resume
-            </h1>
 
             {/* Clear storage button */}
             {preview ? (
-              <div className="flex items-center justify-end w-[30%] gap-2 float-right" >
+              <div className="flex items-center justify-end gap-2 float-right" >
                 <button
                   onClick={clearStoredData}
                   className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -226,53 +224,21 @@ export default function TailorPage() {
                   <Trash2 className="w-4 h-4" />
                   Clear Data
                 </button>
-                <UserMenu  />
+                <UserMenu />
               </div>
             ) : (
               <UserMenu />
             )}
           </div>
-
-          {/* Progress dots */}
-          {/* <div className="overflow-hidden">
-            <div className="flex md:items-center pt-4 pb-3 w-full lg:justify-center overflow-x-scroll">
-              {steps.map((s, i) => (
-                <div key={i} className="flex items-center">
-                  <div className="flex items-center space-x-1 p-2 pr-3 rounded-4xl bg-blue-50">
-                    <div className="min-w-6 h-6 rounded-full bg-gray-600 text-white text-xs flex items-center justify-center">
-                      {i + 1}
-                    </div>
-                    <span className="text-sm text-gray-800 text-nowrap">{s}</span>
-                  </div>
-                  {i < steps.length - 1 && <div className="w-6 lg:w-6 border-t border-2 border-blue-100" />}
-                </div>
-              ))}
-            </div>
-          </div> */}
         </div>
       </div>
+      <PageHeading title="Tailor Your Resume" />
 
       {/* Restored data notification */}
-      {preview && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3 mx-4 w-full max-w-2xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-green-800">
-                <span className="font-medium">Resume restored!</span> Last generated on {formatDate(preview.createdAt)}
-              </p>
-              {preview.jobDescriptionRaw && (
-                <p className="text-xs text-green-600 mt-1">
-                  Job description also available for cover letter generation
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* JD Input */}
-      <h2 className="text-2xl font-bold w-full mb-2 text-center ">Paste Job Description</h2>
       <div className="bg-white mx-4 w-full max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">
+        <h2 className="text-2xl font-bold w-full mb-2 text-gray-600 text-center ">Paste Job Description</h2>
 
         {/* Auto-save indicator */}
         {jdRaw.trim() && !isLoadingFromStorage && (
@@ -300,6 +266,22 @@ export default function TailorPage() {
             <span>{loading ? "Tailoring…" : "Tailor Your Resume"}</span>
             {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <WandSparkles className="w-4 h-4" />}
           </button>
+          {preview && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 mx-4 w-full max-w-2xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-green-800">
+                    <span className="font-medium">Resume restored!</span> Last generated on {formatDate(preview.createdAt)}
+                  </p>
+                  {preview.jobDescriptionRaw && (
+                    <p className="text-xs text-green-600 mt-1">
+                      Job description also available for cover letter generation
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Preview section */}
           {preview && (
@@ -344,7 +326,7 @@ export default function TailorPage() {
                   {/* Quick link to cover letter generation */}
                   <Link
                     href="/dashboard/cover-letter"
-                    className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg font-medium hover:bg-green-700 transition-colors text-center"
+                    className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition-colors text-center"
                   >
                     Generate Cover Letter
                   </Link>
