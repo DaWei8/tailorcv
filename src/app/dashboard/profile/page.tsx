@@ -221,7 +221,18 @@ export default function ProfileManagementPage() {
       <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Create New Profile Button */}
         {profiles.length < MAX_PROFILES && (
-          <div className="mb-8 w-fit flex gap-2 items-center justify-center ">
+          <div className="mb-8 w-full flex items-center justify-between ">
+            <div className=" flex">
+              <div className="inline-flex gap-1" >
+                <div className={`w-12 h-12 rounded-full -mr-8 ${profiles.length >= 1 ? "bg-blue-300": "bg-gray-300"} border-2 border-gray-100 `} ></div>
+                <div className={`w-12 h-12 rounded-full -mr-8 ${profiles.length >= 2 ? "bg-green-300": "bg-gray-300"} border-2 border-gray-100 `} ></div>
+                <div className={`w-12 h-12 rounded-full -mr-8 ${profiles.length >= 3 ? "bg-yellow-300": "bg-gray-300"} border-2 border-gray-100 `} ></div>
+              </div>
+              <div className="text-sm px-3 py-2 gap-2 items-center justify-center flex w-fit bg-gray-100 rounded-3xl text-gray-500" >
+
+                {profiles.length} / {MAX_PROFILES} profiles
+              </div>
+            </div>
             <button
               onClick={() => setShowCreateModal(true)}
               className="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -229,9 +240,7 @@ export default function ProfileManagementPage() {
               <Plus className="w-4 h-4 mr-2" />
               Create New Profile
             </button>
-            <div className="text-sm px-3 py-2 bg-gray-100 rounded-3xl text-gray-500">
-              {profiles.length} / {MAX_PROFILES} profiles
-            </div>
+
           </div>
         )}
 
