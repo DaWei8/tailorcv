@@ -10,6 +10,7 @@ import { ParsedUserProfile, Profile } from "@/lib/schemas";
 import ResumeToProfileCard from "@/components/ResumetoProfileCard";
 // import { NextResponse } from "next/server";
 import { PageHeading } from "@/components/PageHeading";
+import LogoMain from "@/components/Logo";
 
 
 // const supabase = await createClient();
@@ -207,6 +208,7 @@ export default function ProfileManagementPage() {
               <ArrowLeft className="w-5 h-5" />
               Back
             </Link>
+            <LogoMain />
             <div className="text-sm text-gray-500">
               {profiles.length} / {MAX_PROFILES} profiles
             </div>
