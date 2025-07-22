@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
-import axios from "axios";
+import { callGemini } from "@/components/callGemini";
 
 // Define a more specific error type for API calls to avoid using `any`.
 interface APIError extends Error {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const { data: profile } = await supabase
     .from("user_profiles")
     .select("*")
-    .eq("id", user.id)
+    .eq("user_id", user.id)
     .eq("is_master", true)
     .single();
 
@@ -82,28 +82,11 @@ Return only the plain text of the final cover letter, no extra formatting or mar
 `;
 
   try {
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt.replace(/\s+/g, " ").trim(),
-              },
-            ],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.1, // Lower temperature for more consistent results
-          topP: 0.95,
-          topK: 40,
-        },
-      }
-    );
+    const response = await callGemini(prompt.replace(/\s+/g, " ").trim())
 
     const coverLetter =
       response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
 
     if (!coverLetter) {
       console.error("Gemini returned no content:", response.data);
@@ -112,7 +95,7 @@ Return only the plain text of the final cover letter, no extra formatting or mar
         { status: 500 }
       );
     }
-
+    
     // Save the cover letter to database
     const { data: saved, error: saveError } = await supabase
       .from("cover_letters")

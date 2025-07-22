@@ -218,3 +218,46 @@ export interface JobDescription {
   created_at: Timestamp;
   // user_profile_id: string;
 }
+
+
+export interface TailorSection {
+  score_percentage: number;
+  explanation: string;
+  [key: string]: string | number; // to allow matched_keywords, impact_statements, etc.
+}
+
+export interface TailorAnalysis {
+  T_target_keywords: TailorSection & {
+    matched_keywords: string[];
+    missing_keywords: string[];
+  };
+  A_achieved_impact: TailorSection & {
+    impact_statements_found: string[];
+  };
+  I_industry_relevance: TailorSection & {
+    relevant_industries_found: string[];
+  };
+  L_length_of_experience: TailorSection & {
+    total_years_experience: number;
+    average_tenure_years: number;
+    required_experience_years: number;
+  };
+  O_optimized_formatting: TailorSection & {
+    readability_assessment: string;
+    key_sections_present: string[];
+  };
+  R_role_alignment: TailorSection & {
+    aligned_responsibilities: string[];
+    misaligned_responsibilities_or_gaps: string[];
+  };
+}
+
+export interface ATSResult {
+  candidate_name: string;
+  job_title: string;
+  overall_fit_score_percentage: number;
+  overall_recommendation: string;
+  tailor_analysis: TailorAnalysis;
+  red_flags: string[];
+  notes: string;
+}

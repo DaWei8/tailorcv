@@ -1,3 +1,5 @@
+//api/v1/tailor-resume/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import axios from "axios";
@@ -76,7 +78,7 @@ export async function POST(request: NextRequest) {
     const { data: skills, error: skillError } = await supabase
       .from("skills")
       .select("*")
-      .eq("user_id", user.id);
+      .eq("user_profile_id", profile.id);
 
     const { data: education, error: educationError } = await supabase
       .from("education")
@@ -310,7 +312,7 @@ Rules:
       .insert({
         user_profile_id: profile.id,
         resume_jsonb: resumeJson,
-        // ats_score: atsScore,
+        user_id: user.id
       })
       .select()
       .single();

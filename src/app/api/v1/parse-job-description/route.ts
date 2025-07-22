@@ -1,6 +1,8 @@
+//api/v1/parse-job-description/route.ts
+
 import { createClient } from "@/lib/supabase-server";
 import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
+import { callGemini } from "@/components/callGemini";
 
 // Enhanced prompt with detailed instructions and examples
 const prompt = `You are a specialized job description parser. Extract information from job descriptions and return ONLY valid JSON with the following structure:
@@ -205,25 +207,7 @@ export async function POST(req: NextRequest) {
     console.log("Sending prompt to Gemini API:", fullPrompt.slice(0, 300) + "...");
 
     // Make API call to Gemini
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY2}`,
-      {
-        contents: [
-          {
-            parts: [
-              {
-                text: fullPrompt.replace(/\s+/g, " ").trim(),
-              },
-            ],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.1, // Lower temperature for more consistent results
-          topP: 0.95,
-          topK: 40,
-        },
-      }
-    );
+    const response = await callGemini(fullPrompt.replace(/\s+/g, " ").trim())
 
     // Check for Gemini API errors
     if (response.data && response.data.error) {

@@ -3,102 +3,27 @@
 import { useState, ChangeEvent, FormEvent, useRef } from "react";
 import {
   UploadCloud,
-  Download,
   FileText,
   AlertCircle,
   CheckCircle2,
   XCircle,
-  Target,
-  TrendingUp,
-  Clock,
   X,
   RefreshCw,
   ArrowLeft,
+  TrendingUp, // Added for the modal header icon
+  Target, // Added for the button icon
 } from "lucide-react";
 import Link from "next/link";
 import UserMenu from "@/components/UserMenu";
 import { PageHeading } from "@/components/PageHeading";
 import LogoMain from "@/components/Logo";
-
-interface ATSResult {
-  score: number;
-  strengths: string[];
-  improvements: string[];
-  summary: string;
-  matchedKeywords: string[];
-  missingKeywords: string[];
-  recommendations: string[];
-}
+import toast from "react-hot-toast"; // Ensure react-hot-toast is correctly imported and configured
+import AtsReportViewer, { AtsReport } from "@/components/ATSReportViewer";
 
 interface ToastState {
   message: string;
   type: "success" | "error" | "warning";
   id: number;
-}
-function runATS(resumeText: string, jdText: string): ATSResult {
-
-
-  const extractKeywords = (text: string): string[] => {
-    const commonWords = new Set([
-      'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'a', 'an', 'we', 'you', 'they', 'it', 'he', 'she', 'him', 'her', 'his', 'their', 'our', 'my', 'your', 'this', 'that', 'these', 'those', 'i', 'me', 'us', 'them', 'theirs', 'ours', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'just', 'very', 'really', 'some', 'any', 'such', 'much', 'more', 'most', 'many', 'also', 'however', 'though', 'even', 'yet', 'still', 'while', 'although', 'because', 'so', 'than', 'then', 'if', 'when', 'where', 'which', 'who', 'whom', 'whose', 'what', 'how'
-    ]);
-
-    return (text.toLowerCase()
-      .match(/\b[a-z]+(?:[+#]|\b)/g) || [])
-      .filter(word => word.length > 2 && !commonWords.has(word))
-      .filter(word => !/^\d+$/.test(word));
-  };
-
-  const jdKeywords = new Set(extractKeywords(jdText));
-  const resumeKeywords = new Set(extractKeywords(resumeText));
-
-  const matchedKeywords = [...jdKeywords].filter(k => resumeKeywords.has(k));
-  const missingKeywords = [...jdKeywords].filter(k => !resumeKeywords.has(k));
-
-  const score = jdKeywords.size > 0 ? Math.round((matchedKeywords.length / jdKeywords.size) * 100) : 0;
-
-  const getRecommendations = (score: number): string[] => {
-    const recommendations = [];
-
-    if (score < 30) {
-      recommendations.push("Consider restructuring your resume to better align with the job requirements");
-      recommendations.push("Focus on highlighting relevant technical skills and experience");
-      recommendations.push("Use industry-specific terminology from the job description");
-    } else if (score < 60) {
-      recommendations.push("Add more specific keywords from the job description");
-      recommendations.push("Quantify your achievements with numbers and metrics");
-      recommendations.push("Emphasize relevant projects and accomplishments");
-    } else if (score < 80) {
-      recommendations.push("Fine-tune your resume with missing keywords");
-      recommendations.push("Ensure your experience section directly addresses job requirements");
-    } else {
-      recommendations.push("Your resume is well-aligned! Consider minor optimizations");
-      recommendations.push("Focus on quantifying achievements and impact");
-    }
-
-    return recommendations;
-  };
-
-  const getSummary = (score: number): string => {
-    if (score >= 80) return "Excellent match! Your resume strongly aligns with the job requirements.";
-    if (score >= 60) return "Good match with room for improvement. Focus on incorporating missing keywords.";
-    if (score >= 40) return "Fair match. Consider significant updates to better align with the job description.";
-    return "Low match. Your resume needs substantial revision to meet the job requirements.";
-  };
-
-  return {
-    score,
-    matchedKeywords,
-    missingKeywords: missingKeywords.slice(0, 10),
-    strengths: matchedKeywords.length > 0
-      ? matchedKeywords.slice(0, 8).map(k => `Strong alignment: ${k}`)
-      : ["No key skills detected from job description"],
-    improvements: missingKeywords.length > 0
-      ? missingKeywords.slice(0, 8).map(k => `Consider adding: ${k}`)
-      : ["Great keyword coverage!"],
-    recommendations: getRecommendations(score),
-    summary: getSummary(score)
-  };
 }
 
 async function extractTextFromFile(file: File): Promise<string> {
@@ -108,78 +33,86 @@ async function extractTextFromFile(file: File): Promise<string> {
       const text = e.target?.result as string;
       resolve(text || "");
     };
-    reader.onerror = () => reject(new Error("Failed to read file"));
+    reader.onerror = (error) => reject(new Error(`Failed to read file: ${error?.target?.error?.message || 'Unknown error'}`));
     reader.readAsText(file);
   });
 }
 
-function downloadReport(result: ATSResult, fileName: string) {
-  const reportContent = `
-ATS RESUME SCAN REPORT
-Generated: ${new Date().toLocaleString()}
-
-═══════════════════════════════════════════════════════════════
-
-OVERALL SCORE: ${result.score}/100
-
-PERFORMANCE ANALYSIS:
-${result.summary}
-
-═══════════════════════════════════════════════════════════════
-
-STRENGTHS IDENTIFIED:
-${result.strengths.map((s, i) => `${i + 1}. ${s}`).join('\n')}
-
-AREAS FOR IMPROVEMENT:
-${result.improvements.map((i, idx) => `${idx + 1}. ${i}`).join('\n')}
-
-RECOMMENDATIONS:
-${result.recommendations.map((r, i) => `${i + 1}. ${r}`).join('\n')}
-
-═══════════════════════════════════════════════════════════════
-
-KEYWORD ANALYSIS:
-Matched Keywords (${result.matchedKeywords.length}): ${result.matchedKeywords.join(', ')}
-Missing Keywords (${result.missingKeywords.length}): ${result.missingKeywords.join(', ')}
-
-═══════════════════════════════════════════════════════════════
-
-NEXT STEPS:
-
-1. Incorporate missing keywords naturally into your experience
-1. Quantify your achievements with specific metrics
-1. Tailor your resume for each application
-1. Consider using Phasely (https://phasely.app) to plan your skill development
-
-Disclaimer: This analysis is for guidance only. Always ensure your resume
-truthfully represents your experience and qualifications.
-`.trim();
-
-  const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${fileName}_ATS_Report.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
 export default function ATSScanner() {
-
-
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<ATSResult | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [toasts, setToasts] = useState<ToastState[]>([]);
+  const [result, setResult] = useState<AtsReport | null>(null);
+  const [showModal, setShowModal] = useState(false); // This needs to be set to true
+  const [toasts, setToasts] = useState<ToastState[]>([]); // For custom toasts, though react-hot-toast is also used
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // const [file, setFile] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('idle'); // idle, uploading, success, error
-  // const fileInputRef = useRef(null);
+
+  const generateATSResult = async (resumeFile: File, jobDescription: string): Promise<AtsReport | undefined> => {
+    if (!jobDescription.trim()) {
+      toast.error("Job description is required.");
+      return;
+    }
+
+    let resumeText: string;
+    try {
+      resumeText = await extractTextFromFile(resumeFile); // AWAIT the file extraction
+      if (!resumeText.trim()) {
+        toast.error("Extracted resume content is empty. Please check your resume file.");
+        return;
+      }
+    } catch (e) {
+      console.error("Error reading resume data:", e);
+      toast.error("Error reading resume data. Please ensure it's a valid text, PDF, or DOCX file.");
+      return;
+    }
+
+    console.log(resumeText)
+
+    setLoading(true);
+    // toast.error(""); // Removed: This was creating an empty error toast
+
+    try {
+      const res = await fetch("/api/v1/ats-score", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          jobDescription,
+          resumeData: resumeText, // Send the actual text content
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: "Unknown error", details: "Failed to parse error response" }));
+        console.error("API Error:", errorData);
+        // Use the error message from the API if available, otherwise a generic one
+        throw new Error(errorData.error || errorData.details || `HTTP ${res.status}: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+
+      if (!data.atsReport) {
+        throw new Error("No ATS report received from server");
+      }
+
+      toast.success("ATS report ready!");
+      return data.atsReport; // Return only the atsReport object
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error
+        ? err.message
+        : "Something went wrong. Please try again.";
+
+      toast.error(errorMessage); // Display specific error from API or generic
+      console.error("ATS report generation error:", err);
+      // Removed redundant toast.error("Failed to generate ATS report");
+      return undefined; // Ensure a consistent return type on error
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Drag and drop handlers
   const handleDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
@@ -191,8 +124,6 @@ export default function ATSScanner() {
   const handleDragLeave = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     event.stopPropagation();
-
-    // Only set dragOver to false if we're leaving the drop zone entirely
     if (!event.currentTarget.contains(event.relatedTarget as Node)) {
       setIsDragOver(false);
     }
@@ -284,14 +215,16 @@ export default function ATSScanner() {
     setLoading(true);
 
     try {
-      const resumeText = await extractTextFromFile(file);
-      const analysisResult = runATS(resumeText, jobDescription);
-      setResult(analysisResult);
-      setShowModal(true);
-      addToast("Analysis complete!", "success");
+      const analysisResult = await generateATSResult(file, jobDescription);
+      if (analysisResult) { // Only set result and show modal if analysis was successful
+        setResult(analysisResult);
+        setShowModal(true); // <-- THIS IS THE KEY FIX
+        addToast("Analysis complete!", "success");
+      }
     } catch (error) {
       console.error(error);
-      addToast("Error processing your resume. Please try again.", "error");
+      // The generateATSResult already handles toast.error, so this might be redundant
+      // addToast("Error processing your resume. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -301,28 +234,14 @@ export default function ATSScanner() {
     setFile(null);
     setJobDescription("");
     setResult(null);
-    setShowModal(false);
+    setShowModal(false); // Reset modal state
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 60) return "text-yellow-600";
-    if (score >= 40) return "text-orange-600";
-    return "text-red-600";
-  };
-
-  const getScoreBackground = (score: number) => {
-    if (score >= 80) return "bg-green-50 border-green-200";
-    if (score >= 60) return "bg-yellow-50 border-yellow-200";
-    if (score >= 40) return "bg-orange-50 border-orange-200";
-    return "bg-red-50 border-red-200";
-  };
-
   return (
-    <div className="min-h-screen h-full w-full flex flex-col gap-2 items-center bg-gray-50  pb-20">
+    <div className="min-h-screen h-full w-full flex flex-col gap-2 items-center bg-gray-50 pb-20">
       {/* Toast Container */}
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {toasts.map(toast => (
@@ -334,7 +253,7 @@ export default function ATSScanner() {
             {toast.type === "error" && <XCircle size={16} />}
             {toast.type === "warning" && <AlertCircle size={16} />}
             {toast.message}
-            <div onClick={() => removeToast(toast.id)} className="ml-2">
+            <div onClick={() => removeToast(toast.id)} className="ml-2 cursor-pointer">
               <X size={14} />
             </div>
           </div>
@@ -389,16 +308,16 @@ export default function ATSScanner() {
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                     className={`
-              flex flex-col items-center justify-center w-full h-32 
-              border-2 border-dashed rounded-md cursor-pointer 
-              transition-all duration-200 ease-in-out
-              ${isDragOver
+                   flex flex-col items-center justify-center w-full h-32
+                   border-2 border-dashed rounded-md cursor-pointer
+                   transition-all duration-200 ease-in-out
+                   ${isDragOver
                         ? 'border-blue-500 bg-blue-50 scale-105'
                         : file
                           ? 'border-green-400 bg-green-50'
                           : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
                       }
-            `}
+                  `}
                   >
                     <div className="flex flex-col items-center space-y-2">
                       <UploadCloud
@@ -464,8 +383,8 @@ export default function ATSScanner() {
                 {file && (
                   <div className="mt-4">
                     <button
-                      className="w-full bg-blue-600 text-white py-3 px-4 rounded-md font-medium 
-                       hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      className="w-full bg-blue-600 text-white py-3 px-4 rounded-md font-medium
+                         hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
                       Process Resume
                     </button>
@@ -526,7 +445,7 @@ export default function ATSScanner() {
         {showModal && result && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-gray-200">
+              <div className="p-6 z-40 sticky bg-white top-0 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                     <TrendingUp className="w-6 h-6" />
@@ -534,96 +453,17 @@ export default function ATSScanner() {
                   </h2>
                   <div
                     onClick={() => setShowModal(false)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                   >
                     <X size={24} />
                   </div>
                 </div>
               </div>
-
-              <div className="p-6 space-y-6">
-                {/* Score Display */}
-                <div className={`text-center p-6 rounded-md border-2 ${getScoreBackground(result.score)}`}>
-                  <div className={`text-6xl font-bold ${getScoreColor(result.score)} mb-2`}>
-                    {result.score}
-                    <span className="text-2xl text-gray-500">/100</span>
-                  </div>
-                  <p className="text-gray-700 font-medium">{result.summary}</p>
-                </div>
-
-                {/* Analysis Grid */}
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Strengths */}
-                  <div className="bg-green-50 rounded-md p-4">
-                    <h3 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5" />
-                      Strengths ({result.matchedKeywords.length})
-                    </h3>
-                    <ul className="space-y-2">
-                      {result.strengths.map((strength, index) => (
-                        <li key={index} className="text-sm text-green-700 flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
-                          {strength}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Improvements */}
-                  <div className="bg-red-50 rounded-md p-4">
-                    <h3 className="font-semibold text-red-800 mb-3 flex items-center gap-2">
-                      <XCircle className="w-5 h-5" />
-                      Areas for Improvement ({result.missingKeywords.length})
-                    </h3>
-                    <ul className="space-y-2">
-                      {result.improvements.map((improvement, index) => (
-                        <li key={index} className="text-sm text-red-700 flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
-                          {improvement}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Recommendations */}
-                <div className="bg-blue-50 rounded-md p-4">
-                  <h3 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
-                    <Clock className="w-5 h-5" />
-                    Recommendations
-                  </h3>
-                  <ul className="space-y-2">
-                    {result.recommendations.map((rec, index) => (
-                      <li key={index} className="text-sm text-blue-700 flex items-start gap-2">
-                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
-                        {rec}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-4 pt-4">
-                  <button
-                    onClick={() => downloadReport(result, file?.name.split('.')[0] || 'Resume')}
-                    className="flex-1 bg-green-600 text-white py-3 px-6 rounded-md font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Download className="w-5 h-5" />
-                    Download Detailed Report
-                  </button>
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gradient-to-br from-blue-50 to-indigo-100transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
+              <AtsReportViewer atsReport={result} />
             </div>
           </div>
         )}
       </div>
     </div >
   );
-
 }

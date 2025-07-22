@@ -3,171 +3,168 @@ import axios from "axios";
 import { createClient } from "@/lib/supabase-server";
 import { ParsedUserProfile } from "@/lib/schemas";
 
-const supabase = await createClient();
-const {
-  data: { user },
-} = await supabase.auth.getUser();
 
 // Enhanced prompt for resume parsing with detailed instructions
-const prompt = `Extract structured data from a resume and return valid JSON in this format: {"name":"Full name","email":"Email or null","phone":"Phone or null","location":"Address or null","summary":"Professional summary or null","skills":[{"skill":"Name","category":"Soft Skill|Hard Skill|Technical Skill|null","level":"Beginner|Intermediate|Advanced|Expert"}],"certifications":[{"name":"Name","issuer":"Organization","issue_date":"Date or ''","expiry_date":"Date or ''","credential_id":"ID or ''","credential_url":"URL or ''","year":"Year or ''"}],"experience":[{"title":"Job title","company":"Company","duration":"E.g., Jan 2020 - Present","location":"Location or ''","responsibilities":["List of tasks and achievements"]}],"education":[{"field":"Field of study","degree":"Degree","description":"Optional or ''","institution":"School","location":"Location or ''","duration":"e.g., 2016-2020","gpa":GPA or null}],"projects":[{"name":"Name or null","description":"Description or null","technologies":["List or []"],"link":"URL or null"}],"links":{"linkedin":"URL or null","portfolio":"URL or null","github":"URL or null"},"languages":[{"language":"Name","level":"Proficiency"}]}
+
+
+
+
+export async function POST(req: NextRequest) {
+
+  const prompt = `Extract structured data from a resume and return valid JSON in this format: {"name":"Full name","email":"Email or null","phone":"Phone or null","location":"Address or null","summary":"Professional summary or null","skills":[{"skill":"Name","category":"Soft Skill|Hard Skill|Technical Skill|null","level":"Beginner|Intermediate|Advanced|Expert"}],"certifications":[{"name":"Name","issuer":"Organization","issue_date":"Date or ''","expiry_date":"Date or ''","credential_id":"ID or ''","credential_url":"URL or ''","year":"Year or ''"}],"experience":[{"title":"Job title","company":"Company","duration":"E.g., Jan 2020 - Present","location":"Location or ''","responsibilities":["List of tasks and achievements"]}],"education":[{"field":"Field of study","degree":"Degree","description":"Optional or ''","institution":"School","location":"Location or ''","duration":"e.g., 2016-2020","gpa":GPA or null}],"projects":[{"name":"Name or null","description":"Description or null","technologies":["List or []"],"link":"URL or null"}],"links":{"linkedin":"URL or null","portfolio":"URL or null","github":"URL or null"},"languages":[{"language":"Name","level":"Proficiency"}]}
 
 Rules: Clean formatting. Categorize skills as Technical (tools/code), Hard (measurable), or Soft (personal). Preserve date formats. Use nulls/empty strings/arrays where needed. Infer skill levels or default to 'Intermediate'. Include social and project links. Return JSON only.
 `;
 
-// Input validation schema
-interface ResumeParsingInput {
-  parsedResumeData: string;
-  options?: {
-    includePersonalInfo?: boolean;
-    maxSkills?: number;
-    maxExperience?: number;
-  };
-}
+  // Input validation schema
+  interface ResumeParsingInput {
+    parsedResumeData: string;
+    options?: {
+      includePersonalInfo?: boolean;
+      maxSkills?: number;
+      maxExperience?: number;
+    };
+  }
 
-// Type definitions matching your schema
-
-
-// API Error type
-interface APIError extends Error {
-  response?: {
-    data?: unknown;
+  // API Error type
+  interface APIError extends Error {
+    response?: {
+      data?: unknown;
+      status?: number;
+    };
     status?: number;
-  };
-  status?: number;
-  code?: string;
-  type?: string;
-}
+    code?: string;
+    type?: string;
+  }
 
-// Utility function to clean and validate extracted data
-function cleanAndValidateData(
-  data: Partial<ParsedUserProfile>
-): ParsedUserProfile {
-  const cleaned: ParsedUserProfile = {
-    name: typeof data.name === "string" ? data.name.trim() : "Unknown",
-    email: typeof data.email === "string" ? data.email.trim() || null : null,
-    phone: typeof data.phone === "string" ? data.phone.trim() || null : null,
-    location: typeof data.location === "string" ? data.location.trim() || null : null,
-    summary: typeof data.summary === "string" ? data.summary.trim() || null : null,
+  // Utility function to clean and validate extracted data
+  function cleanAndValidateData(
+    data: Partial<ParsedUserProfile>
+  ): ParsedUserProfile {
+    const cleaned: ParsedUserProfile = {
+      name: typeof data.name === "string" ? data.name.trim() : "Unknown",
+      email: typeof data.email === "string" ? data.email.trim() || null : null,
+      phone: typeof data.phone === "string" ? data.phone.trim() || null : null,
+      location: typeof data.location === "string" ? data.location.trim() || null : null,
+      summary: typeof data.summary === "string" ? data.summary.trim() || null : null,
 
-    skills: Array.isArray(data.skills)
-      ? data.skills
-        .filter((skill) => skill && typeof skill.skill === "string" && skill.skill.trim())
-        .map((skill) => ({
-          skill: skill.skill.trim(),
-          category: ["Soft Skill", "Hard Skill", "Technical Skill"].includes(skill.category as string)
-            ? skill.category as "Soft Skill" | "Hard Skill" | "Technical Skill"
-            : undefined,
-          level: typeof skill.level === "string" ? skill.level.trim() : "Intermediate",
-        }))
-      : [],
+      skills: Array.isArray(data.skills)
+        ? data.skills
+          .filter((skill) => skill && typeof skill.skill === "string" && skill.skill.trim())
+          .map((skill) => ({
+            skill: skill.skill.trim(),
+            category: ["Soft Skill", "Hard Skill", "Technical Skill"].includes(skill.category as string)
+              ? skill.category as "Soft Skill" | "Hard Skill" | "Technical Skill"
+              : undefined,
+            level: typeof skill.level === "string" ? skill.level.trim() : "Intermediate",
+          }))
+        : [],
 
-    certifications: Array.isArray(data.certifications)
-      ? data.certifications
-        .filter((cert) => cert && typeof cert.name === "string" && cert.name.trim())
-        .map((cert) => ({
-          name: cert.name.trim(),
-          issuer: typeof cert.issuer === "string" ? cert.issuer.trim() : "",
-          issue_date: typeof cert.issue_date === "string" ? cert.issue_date.trim() : "",
-          expiry_date: typeof cert.expiry_date === "string" ? cert.expiry_date.trim() : "",
-          credential_id: typeof cert.credential_id === "string" ? cert.credential_id.trim() : "",
-          credential_url: typeof cert.credential_url === "string" ? cert.credential_url.trim() : "",
-          year: typeof cert.year === "string" ? cert.year.trim() : "",
-        }))
-      : [],
+      certifications: Array.isArray(data.certifications)
+        ? data.certifications
+          .filter((cert) => cert && typeof cert.name === "string" && cert.name.trim())
+          .map((cert) => ({
+            name: cert.name.trim(),
+            issuer: typeof cert.issuer === "string" ? cert.issuer.trim() : "",
+            issue_date: typeof cert.issue_date === "string" ? cert.issue_date.trim() : "",
+            expiry_date: typeof cert.expiry_date === "string" ? cert.expiry_date.trim() : "",
+            credential_id: typeof cert.credential_id === "string" ? cert.credential_id.trim() : "",
+            credential_url: typeof cert.credential_url === "string" ? cert.credential_url.trim() : "",
+            year: typeof cert.year === "string" ? cert.year.trim() : "",
+          }))
+        : [],
 
-    experience: Array.isArray(data.experience)
-      ? data.experience
-        .filter((exp) => exp && typeof exp.title === "string" && exp.title.trim())
-        .map((exp) => ({
-          title: exp.title.trim(),
-          company: typeof exp.company === "string" ? exp.company.trim() : "",
-          duration: typeof exp.duration === "string" ? exp.duration.trim() : "",
-          location: typeof exp.location === "string" ? exp.location.trim() : "",
-          responsibilities: Array.isArray(exp.responsibilities)
-            ? exp.responsibilities
-              .filter((resp) => typeof resp === "string" && resp.trim())
-              .map((resp) => resp.trim())
-            : [],
-        }))
-      : [],
+      experience: Array.isArray(data.experience)
+        ? data.experience
+          .filter((exp) => exp && typeof exp.title === "string" && exp.title.trim())
+          .map((exp) => ({
+            title: exp.title.trim(),
+            company: typeof exp.company === "string" ? exp.company.trim() : "",
+            duration: typeof exp.duration === "string" ? exp.duration.trim() : "",
+            location: typeof exp.location === "string" ? exp.location.trim() : "",
+            responsibilities: Array.isArray(exp.responsibilities)
+              ? exp.responsibilities
+                .filter((resp) => typeof resp === "string" && resp.trim())
+                .map((resp) => resp.trim())
+              : [],
+          }))
+        : [],
 
-    education: Array.isArray(data.education)
-      ? data.education
-        .filter((edu) => edu && typeof edu.institution === "string" && edu.institution.trim())
-        .map((edu) => ({
-          field: typeof edu.field === "string" ? edu.field.trim() : "",
-          degree: typeof edu.degree === "string" ? edu.degree.trim() : "",
-          description: typeof edu.description === "string" ? edu.description.trim() : "",
-          institution: edu.institution.trim(),
-          location: typeof edu.location === "string" ? edu.location.trim() : "",
-          duration: typeof edu.duration === "string" ? edu.duration.trim() : "",
-          gpa: typeof edu.gpa === "number" ? edu.gpa : undefined,
-        }))
-      : [],
+      education: Array.isArray(data.education)
+        ? data.education
+          .filter((edu) => edu && typeof edu.institution === "string" && edu.institution.trim())
+          .map((edu) => ({
+            field: typeof edu.field === "string" ? edu.field.trim() : "",
+            degree: typeof edu.degree === "string" ? edu.degree.trim() : "",
+            description: typeof edu.description === "string" ? edu.description.trim() : "",
+            institution: edu.institution.trim(),
+            location: typeof edu.location === "string" ? edu.location.trim() : "",
+            duration: typeof edu.duration === "string" ? edu.duration.trim() : "",
+            gpa: typeof edu.gpa === "number" ? edu.gpa : undefined,
+          }))
+        : [],
 
-    projects: Array.isArray(data.projects)
-      ? data.projects
-        .filter((proj) => proj && (proj.name || proj.description))
-        .map((proj) => ({
-          name: typeof proj.name === "string" ? proj.name.trim() || undefined : undefined,
-          description: typeof proj.description === "string" ? proj.description.trim() || undefined : undefined,
-          technologies: Array.isArray(proj.technologies)
-            ? proj.technologies
-              .filter((tech) => typeof tech === "string" && tech.trim())
-              .map((tech) => tech.trim())
-            : [],
-          link: typeof proj.link === "string" ? proj.link.trim() || undefined : undefined,
-        }))
-      : [],
+      projects: Array.isArray(data.projects)
+        ? data.projects
+          .filter((proj) => proj && (proj.name || proj.description))
+          .map((proj) => ({
+            name: typeof proj.name === "string" ? proj.name.trim() || undefined : undefined,
+            description: typeof proj.description === "string" ? proj.description.trim() || undefined : undefined,
+            technologies: Array.isArray(proj.technologies)
+              ? proj.technologies
+                .filter((tech) => typeof tech === "string" && tech.trim())
+                .map((tech) => tech.trim())
+              : [],
+            link: typeof proj.link === "string" ? proj.link.trim() || undefined : undefined,
+          }))
+        : [],
 
-    links: {
-      linkedin: data.links && typeof data.links.linkedin === "string"
-        ? data.links.linkedin.trim() || undefined
-        : undefined,
-      portfolio: data.links && typeof data.links.portfolio === "string"
-        ? data.links.portfolio.trim() || undefined
-        : undefined,
-      github: data.links && typeof data.links.github === "string"
-        ? data.links.github.trim() || null
-        : null,
-    },
+      links: {
+        linkedin: data.links && typeof data.links.linkedin === "string"
+          ? data.links.linkedin.trim() || undefined
+          : undefined,
+        portfolio: data.links && typeof data.links.portfolio === "string"
+          ? data.links.portfolio.trim() || undefined
+          : undefined,
+        github: data.links && typeof data.links.github === "string"
+          ? data.links.github.trim() || null
+          : null,
+      },
 
-    languages: Array.isArray(data.languages)
-      ? data.languages
-        .filter((lang) => lang && typeof lang.language === "string" && lang.language.trim())
-        .map((lang) => ({
-          language: lang.language.trim(),
-          level: typeof lang.level === "string" ? lang.level.trim() : "Conversational",
-        }))
-      : [],
-  };
+      languages: Array.isArray(data.languages)
+        ? data.languages
+          .filter((lang) => lang && typeof lang.language === "string" && lang.language.trim())
+          .map((lang) => ({
+            language: lang.language.trim(),
+            level: typeof lang.level === "string" ? lang.level.trim() : "Conversational",
+          }))
+        : [],
+    };
 
-  // Remove duplicates while preserving order
-  cleaned.skills = cleaned.skills.filter((skill, index, array) =>
-    array.findIndex((s) => s.skill.toLowerCase() === skill.skill.toLowerCase()) === index
-  );
+    // Remove duplicates while preserving order
+    cleaned.skills = cleaned.skills.filter((skill, index, array) =>
+      array.findIndex((s) => s.skill.toLowerCase() === skill.skill.toLowerCase()) === index
+    );
 
-  return cleaned;
-}
+    return cleaned;
+  }
 
-// Pre-process parsed resume data
-function preprocessResumeData(parsedData: string): string {
-  return parsedData
-    .replace(/\r\n/g, "\n") // Normalize line endings
-    .replace(/\s+/g, " ") // Replace multiple spaces with single space
-    .replace(/\n\s*\n/g, "\n") // Remove extra blank lines
-    .trim();
-}
+  // Pre-process parsed resume data
+  function preprocessResumeData(parsedData: string): string {
+    return parsedData
+      .replace(/\r\n/g, "\n") // Normalize line endings
+      .replace(/\s+/g, " ") // Replace multiple spaces with single space
+      .replace(/\n\s*\n/g, "\n") // Remove extra blank lines
+      .trim();
+  }
 
-// Type guard for API errors
-function isAPIError(error: unknown): error is APIError {
-  return (
-    error instanceof Error &&
-    ("status" in error || "code" in error || "type" in error || "response" in error)
-  );
-}
-
-export async function POST(req: NextRequest) {
+  // Type guard for API errors
+  function isAPIError(error: unknown): error is APIError {
+    return (
+      error instanceof Error &&
+      ("status" in error || "code" in error || "type" in error || "response" in error)
+    );
+  }
 
   try {
     // Check if API key is configured
@@ -368,6 +365,11 @@ export async function POST(req: NextRequest) {
 
 // Separate endpoint to save the profile after user preview
 export async function PUT(req: NextRequest) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
