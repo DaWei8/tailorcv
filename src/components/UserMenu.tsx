@@ -202,38 +202,33 @@ export default function UserMenu() {
 
       {/* History Sidebar */}
       {showHistory && (
-        <div className="fixed top-0 right-0 w-[70vw] md:w-[40vw] h-full bg-white shadow-lg z-50">
+        <div className="fixed top-0 right-0 w-[70vw] md:w-[35vw] h-full bg-white shadow-lg z-50">
           <div className="flex justify-between items-center px-4 py-3 border-b">
             <h3 className="font-semibold text-lg">History</h3>
             <button onClick={() => setShowHistory(false)}>✕</button>
           </div>
-          <div className="p-4">
+          <div className="p-4 pt-8 max-h-[90vh] flex flex-col gap-4 overflow-x-scroll ">
             {/* History content here */}
             {history?.length !== 0 ? history?.map((job) => {
               return (<div
                 key={job.id}
                 className="bg-white shadow-sm border border-gray-200 rounded-xl p-4 max-w-2xl mb-4"
               >
-                <div className="flex justify-between items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-gray-500">
                   <span>{new Date(job.created_at).toLocaleString()}</span>
-                  <button
-                    onClick={() => copyToClipboard(job.raw_text)}
-                    className="text-gray-400 hover:text-gray-600 transition"
-                    title="Copy to clipboard"
-                  >
-                    <Copy size={16} />
-                  </button>
                 </div>
 
-                <div className="mt-2 text-base text-gray-800 line-clamp-4">
+                <div className="mt-2 text-base mb-2 text-gray-800 line-clamp-4">
                   {job.raw_text}
                 </div>
 
-                {job.parsed && (
-                  <div className="mt-2 text-xs text-green-600 font-medium">
-                    ✅ Parsed
-                  </div>
-                )}
+                <button
+                  onClick={() => copyToClipboard(job.raw_text)}
+                  className="text-gray-400 hover:text-gray-600 transition"
+                  title="Copy to clipboard"
+                >
+                  <Copy size={24} />
+                </button>
               </div>)
             }) : <p className="text-sm text-gray-500">Your recent resume generations will appear here.</p>}
           </div>
