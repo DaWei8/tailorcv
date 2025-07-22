@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase-server";
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
@@ -206,7 +206,7 @@ export async function POST(req: NextRequest) {
 
     // Make API call to Gemini
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY2}`,
       {
         contents: [
           {
@@ -281,7 +281,6 @@ export async function POST(req: NextRequest) {
       .from("job_descriptions")
       .insert({
         user_id: user.id,
-        user_profile_id: user.id,
         parsed: cleanedData, // Use the resume ID from the data
         raw_text: rawText,
       })

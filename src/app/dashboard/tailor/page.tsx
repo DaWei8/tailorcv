@@ -89,15 +89,11 @@ const storageUtils = {
 
 export default function TailorPage() {
 
-  // if (!user) {
-  //   redirect('/dashboard')
-  // }
   const [jdRaw, setJdRaw] = useState("");
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<ResumePreview | null>(null);
   const [isLoadingFromStorage, setIsLoadingFromStorage] = useState(true);
 
-  // const steps = ["Paste the Job Info", "Tailor Your Resume", "Preview & Download", "Generate Cover Letter"];
 
   // Load saved data on component mount
   useEffect(() => {
@@ -162,7 +158,6 @@ export default function TailorPage() {
 
       setPreview(resumeWithMetadata);
 
-      // Save job description for cover letter use
       jobDescriptionStorage.save(jdRaw);
 
       toast.success("Resume ready!");
@@ -225,8 +220,6 @@ export default function TailorPage() {
         </div>
       </div>
       <PageHeading title="Tailor Your Resume" />
-
-      {/* Restored data notification */}
 
       {/* JD Input */}
       <div className="bg-white mx-4 w-full max-w-2xl flex flex-col rounded-xl shadow-xl lg:p-6 p-4">

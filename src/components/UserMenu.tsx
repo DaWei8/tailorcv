@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { Copy } from "lucide-react";
 import type { User } from "@supabase/supabase-js"
 import { createClient } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
@@ -19,6 +20,18 @@ export default function UserMenu() {
 
   const router = useRouter()
   const supabase = createClient()
+
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      // optional: show toast or feedback
+      toast.success("Copied to clipboard!");
+    } catch (err) {
+      toast.error("Failed to copy");
+      console.log(err)
+    }
+  };
 
   useEffect(() => {
     // Get initial user
@@ -197,11 +210,25 @@ export default function UserMenu() {
           <div className="p-4">
             {/* History content here */}
             {history?.length !== 0 ? history?.map((job) => {
-              return (<div key={job.id} className="bg-white shadow-sm border border-gray-200 rounded-xl p-4 max-w-2xl mb-4">
-                <div className="text-sm text-gray-500">{new Date(job.created_at).toLocaleString()}</div>
+              return (<div
+                key={job.id}
+                className="bg-white shadow-sm border border-gray-200 rounded-xl p-4 max-w-2xl mb-4"
+              >
+                <div className="flex justify-between items-center text-sm text-gray-500">
+                  <span>{new Date(job.created_at).toLocaleString()}</span>
+                  <button
+                    onClick={() => copyToClipboard(job.raw_text)}
+                    className="text-gray-400 hover:text-gray-600 transition"
+                    title="Copy to clipboard"
+                  >
+                    <Copy size={16} />
+                  </button>
+                </div>
+
                 <div className="mt-2 text-base text-gray-800 line-clamp-4">
                   {job.raw_text}
                 </div>
+
                 {job.parsed && (
                   <div className="mt-2 text-xs text-green-600 font-medium">
                     ✅ Parsed

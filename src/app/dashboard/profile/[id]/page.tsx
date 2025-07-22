@@ -10,12 +10,11 @@ import { createClient } from "@/lib/supabase";
 import { PlusCircle, Trash2, ChevronLeft, ChevronRight, User, Briefcase, GraduationCap, Award, Globe, Wrench, ArrowLeft, Star } from "lucide-react";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
-
-/* ---------- Schemas & Types ---------- */
 import { profileSchema, experienceSchema, educationSchema, certSchema, langSchema, skillSchema } from "@/lib/schemas";
 import type { ProfileForm, ExperienceForm, EducationForm, CertForm, LangForm, SkillForm, Profile } from "@/lib/schemas";
 import Link from "next/link";
 import LogoMain from "@/components/Logo";
+import { supabase } from "@/app/helpers/helpers";
 
 // Ensure schemas align with form types
 const experienceArraySchema = z.object({ items: z.array(experienceSchema) });
@@ -33,18 +32,6 @@ const steps = [
     { id: "languages", title: "Languages", icon: Globe },
     { id: "skills", title: "Skills", icon: Wrench },
 ];
-
-/* ---------- Helpers ---------- */
-const getUserId = async () => {
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) {
-        toast.error("Failed to get user ID");
-        return null;
-    }
-    console.log(data?.user?.id)
-    return data.user.id;
-};
 
 /* ---------- Reusable Section ---------- */
 interface SectionProps<T> {
@@ -76,43 +63,60 @@ function Section<T extends FieldValues>({ title, form, table, addDefault, profil
 
     const save = async () => {
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
 
+        // Get the current authenticated user
+        const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
             toast.error('Not authenticated');
             return;
         }
 
         // Verify the user_profile_id belongs to the current user
-        const { data: profileData, error: profileError } = await supabase
+        const { data: userProfile, error: profileError } = await supabase
             .from('user_profiles')
             .select('id')
+            .eq('id', profileId)
             .eq('user_id', user.id)
             .single();
 
-        if (profileError || !profileData) {
-            toast.error('Could not verify user profile');
+        if (profileError || !userProfile) {
+            toast.error('Could not verify user profile ownership');
             return;
         }
 
-        const payload = form.getValues("items").map(item => ({
-            ...item,
-            user_profile_id: profileData.id // Use the verified profile ID
-        }));
+        // Get form data and prepare payload
+        const formItems = form.getValues("items");
 
-        const { data, error } = await supabase
+        // First, delete existing records for this profile to handle removals
+        const { error: deleteError } = await supabase
             .from(table)
-            .upsert(payload)
-            .select();
+            .delete()
+            .eq('user_profile_id', profileId);
 
-        if (error) {
-            console.error('Detailed Save Error:', {
-                message: error.message,
-                details: error.details,
-                code: error.code
-            });
-            toast.error(`Failed to save ${title} - ${data}: ${error.message}`);
+        if (deleteError) {
+            console.error('Delete Error:', deleteError);
+            toast.error(`Failed to update ${title}: ${deleteError.message}`);
             return;
+        }
+
+        // If there are items to insert, insert them
+        if (formItems.length > 0) {
+            const payload = formItems.map((item: T) => ({
+                ...item,
+                id: item.id || uuidv4(), // Ensure each item has an ID
+                user_profile_id: profileId,
+                user_id: user.id  // Add this line
+            }));
+
+            const { error: insertError } = await supabase
+                .from(table)
+                .insert(payload);
+
+            if (insertError) {
+                console.error('Insert Error:', insertError);
+                toast.error(`Failed to save ${title}: ${insertError.message}`);
+                return;
+            }
         }
 
         toast.success(`${title} saved successfully`);
@@ -218,79 +222,72 @@ export default function ProfileEditPage() {
         if (!userProfileId) return;
 
         (async () => {
-            const uid = await getUserId();
-            if (!uid) return;
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                toast.error("Not authenticated");
+                router.push("/login");
+                return;
+            }
 
-            const supabase = createClient();
-
-            // Load profile info
+            // Load profile info and verify ownership
             const { data: profile, error: profileError } = await supabase
                 .from("user_profiles")
                 .select("*")
                 .eq("id", userProfileId)
+                .eq("user_id", user.id)
                 .single();
 
             if (profileError) {
-                toast.error("Profile not found");
+                toast.error("Profile not found or access denied");
                 router.push("/dashboard/profile");
                 return;
             }
 
             setProfile(profile);
 
-            // Load basic profile data
-            const { data, error } = await supabase.from("user_profiles").select().eq("id", userProfileId).single();
-            if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-                toast.error("Failed to load profile");
-                return;
-            }
-            if (data) {
-                Object.entries(data).forEach(([key, value]) => {
-                    if (key in profileSchema.shape) {
-                        setValue(key as keyof ProfileForm, value as ProfileForm[keyof ProfileForm]);
-                    }
-                });
-            }
+            // Load basic profile data into form
+            Object.entries(profile).forEach(([key, value]) => {
+                if (key in profileSchema.shape) {
+                    setValue(key as keyof ProfileForm, value as ProfileForm[keyof ProfileForm]);
+                }
+            });
         })();
     }, [userProfileId, setValue, router]);
 
     const saveProfile = async (data: ProfileForm) => {
-        const supabase = createClient();
-
-        // Get the current authenticated user
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
             toast.error("Not authenticated");
             return;
         }
+
         if (!userProfileId) {
             toast.error("Invalid profile ID");
             return;
         }
+
         const payload = {
             id: userProfileId,
             ...data,
             user_id: user.id
         };
 
-        const { data: upsertedData, error } = await supabase
+        const { error } = await supabase
             .from("user_profiles")
-            .upsert(payload)
-            .select()
-            .single();
+            .update(payload)
+            .eq('id', userProfileId)
+            .eq('user_id', user.id);
 
         if (error) {
-            console.error('Detailed Profile Save Error:', {
-                message: error.message,
-                details: error.details,
-                code: error.code
-            });
+            console.error('Profile Save Error:', error);
             toast.error(`Failed to save profile: ${error.message}`);
             return;
         }
 
         toast.success("Profile saved successfully");
-        return upsertedData;
+
+        // Update the profile state to reflect changes
+        setProfile(prev => prev ? { ...prev, ...data } : null);
     };
 
     /* Common Input Component */

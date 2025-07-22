@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
-import { createClient } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase-server";
 import { ParsedUserProfile } from "@/lib/schemas";
-// import type { NextApiRequest, NextApiResponse } from 'next';
-// import { readFileSync } from 'fs';
-// import path from 'path';
-// import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 
 const supabase = await createClient();
 const {

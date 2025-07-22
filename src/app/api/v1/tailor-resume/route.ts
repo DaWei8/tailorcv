@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
   try {
     // Check if API key is configured
     if (
-      !process.env.GEMINI_API_KEY ||
-      process.env.GEMINI_API_KEY === "undefined"
+      !process.env.GEMINI_API_KEY3 ||
+      process.env.GEMINI_API_KEY3 === "undefined"
     ) {
       console.error(
         "GEMINI_API_KEY is missing or undefined in environment variables."
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     const { data: profile, error: profileError } = await supabase
       .from("user_profiles")
       .select("*")
-      .eq("id", user.id).eq("is_master", true)
+      .eq("user_id", user.id).eq("is_master", true)
       .single();
 
     const { data: experiences, error: experienceError } = await supabase
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     const { data: skills, error: skillError } = await supabase
       .from("skills")
       .select("*")
-      .eq("user_profile_id", user.id);
+      .eq("user_id", user.id);
 
     const { data: education, error: educationError } = await supabase
       .from("education")
@@ -303,11 +303,6 @@ Rules:
         { status: 500 }
       );
     }
-
-    // // Calculate ATS score
-    // const atsScore = Math.round(
-    //   (resumeJson.skills?.length / jobDescription.required_skills.length) * 100
-    // );
 
     // Save to database
     const { data: tailoredResume, error: saveError } = await supabase
