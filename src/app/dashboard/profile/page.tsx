@@ -6,8 +6,8 @@ import { User, Plus, Edit, Trash2, Star, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { ParsedUserProfile, Profile } from "@/lib/schemas";
-import ResumeToProfileCard from "@/components/ResumetoProfileCard";
+import {Profile } from "@/lib/schemas";
+// import ResumeToProfileCard from "@/components/ResumetoProfileCard";
 // import { NextResponse } from "next/server";
 import { PageHeading } from "@/components/PageHeading";
 import LogoMain from "@/components/Logo";
@@ -174,15 +174,15 @@ export default function ProfileManagementPage() {
       loadProfiles();
     }
   };
-  const handleSaveSuccess = (profile: ParsedUserProfile) => {
-    console.log('Profile saved:', profile);
-    // Handle success (e.g., redirect, show notification)
-  };
+  // const handleSaveSuccess = (profile: ParsedUserProfile) => {
+  //   console.log('Profile saved:', profile);
+  //   // Handle success (e.g., redirect, show notification)
+  // };
 
-  const handleError = (error: unknown) => {
-    console.error('Error:', error);
-    // Handle errors (e.g., show toast notification)
-  };
+  // const handleError = (error: unknown) => {
+  //   console.error('Error:', error);
+  //   // Handle errors (e.g., show toast notification)
+  // };
 
   // Navigate to profile editor
   const editProfile = (profileId: string) => {
@@ -258,11 +258,11 @@ export default function ProfileManagementPage() {
               <Plus className="w-4 h-4 mr-2" />
               Create Profile
             </button>
-            <ResumeToProfileCard
+            {/* <ResumeToProfileCard
               apiEndpoint="/api/v1/parse-resume-to-profile"
               onError={handleError}
               onSaveSuccess={handleSaveSuccess}
-            />
+            /> */}
           </div>
         ) : (
 
@@ -328,13 +328,13 @@ export default function ProfileManagementPage() {
                 )}
               </div>
             ))}
-            {
+            {/* {
               profiles.length === MAX_PROFILES ? <></> : <ResumeToProfileCard
                 apiEndpoint="/api/v1/parse-resume-to-profile"
                 onError={handleError}
                 onSaveSuccess={handleSaveSuccess}
               />
-            }
+            } */}
           </div>
 
 
