@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
 import NavLanding from "@/components/NavLanding";
+import PricingPage from "../pricing/page";
 // import Logo from "../../../public/logo.svg"
 // import Image from "next/image";
 
@@ -50,6 +51,8 @@ export default function LandingPage() {
           desc="Clean templates + score feedback to beat filters."
         />
       </section>
+
+      <PricingPage />
 
       {/* Footer CTA */}
       <footer className="mt-24 sticky bottom-0 w-full bg-gray-900 py-5 text-center">

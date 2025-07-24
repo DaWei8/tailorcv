@@ -4,11 +4,11 @@ import Logo from "../../public/logo2.svg"
 
 const NavLanding = () => {
     return (
-        <nav className="w-full flex items-center sticky top-0 z-50 z-10 justify-between pt-2 px-2 bg-white shadow " >
+        <nav className="w-full flex items-center sticky top-0 z-50 justify-between pt-2 pb-2 px-2 bg-white shadow " >
             <Image src={Logo} className="w-24" priority alt="Tailor CV logo" />
             <div className="flex items-center space-x-4" >
-                <Link href="/pricing" className=" text-gray-700 p-4 flex items-center justify-center font-medium ">Pricing</Link>
-                <Link href="/login" className="py-3 px-4 flex items-center justify-center rounded-md border border-blue-600 text-blue-600 font-semibold ">
+                {/* <Link href="/pricing" className=" text-gray-700 p-4 flex items-center justify-center font-medium ">Pricing</Link> */}
+                <Link href="/login" className="py-3 px-8 flex items-center justify-center rounded-md border border-blue-600 text-blue-600 font-semibold ">
                     Login
                 </Link>
             </div>

@@ -1,7 +1,4 @@
-import Logo from "../../../public/logo.svg"
 import PricingCard from "@/components/PricingCard";
-import Image from "next/image";
-import Link from "next/link";
 
 export const metadata = {
     title: "TailorCV Pricing",
@@ -10,11 +7,11 @@ export const metadata = {
 
 export default function PricingPage() {
     return (
-        <main className="bg-white min-h-screen pt-4 flex flex-col items-center justify-center relative text-gray-900">
+        <section className=" min-h-screen pt-4 flex flex-col items-center justify-center relative text-gray-900">
             {/* <NavLanding /> */}
-            <Link href="/landing" className="font-bold w-full bg-white pt-2 pb-4 flex items-center justify-center sticky top-0 z-50 text-xl">
+            {/* <Link href="/landing" className="font-bold w-full bg-white pt-2 pb-4 flex items-center justify-center sticky top-0 z-50 text-xl">
                 <Image src={Logo} className="w-32" alt="Tailor CV logo" />
-            </Link>
+            </Link> */}
             <div className="max-w-6xl mx-auto text-center pt-28 px-4 lg:px-8 space-y-6">
                 {/* Hero */}
                 <h1 className="text-4xl md:text-5xl font-extrabold">
@@ -44,7 +41,7 @@ export default function PricingPage() {
                     </details>
                 </div>
             </div>
-        </main>
+        </section>
     );
 }
 
