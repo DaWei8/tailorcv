@@ -1,4 +1,3 @@
-// app/login/page.tsx
 "use client"
 
 import { useEffect } from "react"
@@ -16,13 +15,13 @@ export default function LoginPage() {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth event:', event, 'Session:', session)
-        
+
         if (event === "SIGNED_IN") {
           toast.success("Logged in successfully!")
           router.push("/dashboard")
           router.refresh() // Refresh to update server components
         }
-        
+
         if (event === "SIGNED_OUT") {
           router.push("/login")
           router.refresh()
@@ -44,7 +43,6 @@ export default function LoginPage() {
         <p className="text-center text-[15px] text-gray-600 mb-2">
           Sign in to tailor your resume and get more interviews.
         </p>
-        
         <Auth
           supabaseClient={supabase}
           providers={["google"]}
